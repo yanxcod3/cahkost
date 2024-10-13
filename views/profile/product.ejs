@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .promo-icon {
+          animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-30px);
+          }
+          60% {
+            transform: translateY(-15px);
+          }
+        }
+        .slider-container {
+            position: relative;
+        }
+
+        .slider-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+    </style>
+  </head>
+  <body class="font-sans antialiased bg-gray-100">
+    <!-- Section: Daftar Produk Kost -->
+    <main class="container mx-auto px-4 py-8">
+        <section class="mt-4">
+        <h1 class="text-4xl font-bold text-center mb-8">Daftar Produk Kost</h1>
+
+        <!-- Container untuk produk kost -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Daftar Produk Kost -->
+            <% product.forEach(function(data) { %>
+                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative">
+                <img src="/uploads/<%= data.product_owner %>/product/<%= data.product_id %>/1.jpeg" alt="Cah Kost" class="rounded-lg w-full" style="height: 440px; object-fit: cover;" />
+                <% if(data.product_promo != '0') { %>
+                    <div class="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-bl-lg promo-icon"><strong>Promo</strong></div>
+                    <div class="absolute top-0 left-0 bg-purple-500 text-white px-2 py-1 rounded-br-lg"><strong><%= data.product_type %></strong></div>
+                    <h3 class="mt-4 text-lg font-bold text-gray-800"><%= data.product_name %></h3>
+                    <p class="mt-2 text-gray-600"><span class="text-red-500 line-through"><b>Rp <%= data.product_price.toLocaleString('id-ID') %></span></b> Rp <%= data.product_promo.toLocaleString('id-ID') %> / bulan</p>
+                <% } else { %>
+                    <div class="absolute top-0 left-0 bg-purple-500 text-white px-2 py-1 rounded-br-lg"><strong><%= data.product_type %></strong></div>
+                    <h3 class="mt-4 text-lg font-bold text-gray-800"><%= data.product_name %></h3>
+                    <p class="mt-2 text-gray-600">Rp <%= data.product_price.toLocaleString('id-ID') %> / bulan</p>
+                <% } %>
+                <p class="mt-2 text-sm text-gray-600"><%= data.product_deskripsi %></p>
+                
+                <!-- Tombol Edit dan Delete -->
+                <div class="flex justify-between mt-4">
+                    <a 
+                    class="bg-green-500 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-green-600"
+                    data-productid="<%= data.product_id %>"
+                    data-owner="<%= data.product_owner %>"
+                    data-name="<%= data.product_name %>""
+                    data-type="<%= data.product_type %>"
+                    data-deskripsi="<%= data.product_deskripsi %>"
+                    data-address="<%= data.product_address %>"
+                    data-price="<%= data.product_price %>"
+                    data-promo="<%= data.product_promo %>"
+                    data-fasilitasK="<%= data.product_fasilitasK %>"
+                    data-fasilitasB="<%= data.product_fasilitasB %>"
+                    data-gambar="<%= data.product_gambar %>"
+                    onclick="openModalForm(this)">Edit</a>
+                    <a class="bg-red-500 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-red-600" data-productid="<%= data.product_id %>" onclick="confirmDelete(this)">Delete</a>
+                </div>
+                </div>
+            <% }); %>
+        </div>
+
+        <!-- Link kembali ke beranda -->
+        <p class="text-center text-sm text-black-400 mt-8">
+            Kembali ke
+            <a href="/" class="font-medium text-indigo-400 hover:text-indigo-300">Beranda</a>
+        </p>
+        </section>
+
+        <!-- Modal Product Form -->
+        <div
+        id="formModal"
+        class="fixed inset-0 hidden flex items-center bg-gray-400 bg-opacity-75 justify-center z-50 overflow-y-auto"
+    >
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative mt-4 overflow-auto max-h-screen">
+            <h2 class="text-2xl font-bold mb-4">Edit Produk</h2>
+    
+            <!-- Close Icon -->
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeModalForm()">
+                ✖
+            </button>
+            
+            <!-- Product Form -->
+            <form id="productForm" class="mt-4 space-y-4" enctype="multipart/form-data" onsubmit="return validateForm(event);">
+                <div class="flex justify-between space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Nama Kost</label>
+                        <input type="text" id="nameKost" name="nameKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan nama kost" />
+                        <span class="text-red-600 text-sm hidden" id="nameKostAlert">Nama Kost harus diisi.</span>
+                    </div>
+                
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Kelas Kost</label>
+                        <select id="typeKost" name="typeKost" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="KOST PRIA">Kost Pria</option>
+                            <option value="KOST WANITA">Kost Wanita</option>
+                            <option value="KOST EKSKLUSIF">Kost Eksklusif</option>
+                        </select>
+                        <span class="text-red-600 text-sm hidden" id="typeKostAlert">Kelas Kost harus dipilih.</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600">Alamat Kost</label>
+                    <input type="text" id="alamatKost" name="alamatKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan alamat lengkap kost" />
+                    <span class="text-red-600 text-sm hidden" id="alamatKostAlert">Alamat Kost harus diisi.</span>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600">Deskripsi Kost</label>
+                    <textarea id="deskripsiKost" name="deskripsiKost" class="w-full px-4 py-2 border rounded-lg" rows="2" placeholder="Masukkan deskripsi kost dan sertakan aturan kost yang berlaku"></textarea>
+                    <span class="text-red-600 text-sm hidden" id="deskripsiKostAlert">Deskripsi Kost harus diisi.</span>
+                </div>
+                
+                <div class="flex justify-between space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Harga Kost</label>
+                        <input type="text" id="priceKost" name="priceKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan harga kost" oninput="formatCurrency(this); updatePromoPrice()" />
+                        <span class="text-red-600 text-sm hidden" id="priceKostAlert">Harga Kost harus diisi.</span>
+                    </div>
+                
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Promo (%)</label>
+                        <input type="number" id="promoKost" name="promoKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan promo" oninput="updatePromoPrice(); this.value = this.value.slice(0, 3)" min="5" max="100"/>
+                        <span class="text-red-600 text-sm hidden" id="promoKostAlert">Masukkan promo jika ada, jika tidak abaikan.</span>
+                    </div>
+                </div>
+                
+                <!-- Add the promotional price input field -->
+                <div id="promoPriceContainer" class="hidden">
+                    <label class="block text-gray-600">Harga Promo</label>
+                    <input type="text" id="promoPriceKost" name="promoPriceKost" class="w-full px-4 py-2 border rounded-lg font-bold" placeholder="Masukkan harga promo" readonly />
+                </div>
+                
+                <span id="promoAlert" class="text-green-500 text-sm hidden">Abaikan kolom promo bila tidak ingin memasang harga promo.</span> 
+                
+                <div class="flex-1">
+                    <label class="block text-gray-600">Detail Kost</label>
+                    <select id="infoKost" name="infoKost" class="w-full px-4 py-2 border rounded-lg" onchange="toggleFacilities()">
+                        <option value="fasilitasK">Fasilitas Kamar</option>
+                        <option value="fasilitasB">Fasilitas Bersama</option>
+                    </select>
+                
+                    <!-- Fasilitas Kamar Section -->
+                    <div id="fasilitasKamar">
+                        <label class="block text-gray-600 mt-4">Fasilitas Kamar</label>
+                        <div class="flex flex-wrap">
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="listrik" name="fasilitasKamar[]" value="listrik" class="mr-2" />
+                                <label for="listrik">Listrik</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kMandiDalam" name="fasilitasKamar[]" value="kMandiDalam" class="mr-2" />
+                                <label for="kMandiDalam">K. Mandi Dalam</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="wifi" name="fasilitasKamar[]" value="wifi" class="mr-2" />
+                                <label for="wifi">WiFi</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="ac" name="fasilitasKamar[]" value="ac" class="mr-2" />
+                                <label for="ac">AC</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kasur" name="fasilitasKamar[]" value="kasur" class="mr-2" />
+                                <label for="kasur">Kasur</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="jendela" name="fasilitasKamar[]" value="jendela" class="mr-2" />
+                                <label for="jendela">Jendela</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="tvKamar" name="fasilitasKamar[]" value="tv" class="mr-2" />
+                                <label for="tvKamar">TV</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kursi" name="fasilitasKamar[]" value="kursi" class="mr-2" />
+                                <label for="kursi">Kursi</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kipasAngin" name="fasilitasKamar[]" value="kipasAngin" class="mr-2" />
+                                <label for="kipasAngin">Kipas Angin</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="meja" name="fasilitasKamar[]" value="meja" class="mr-2" />
+                                <label for="meja">Meja</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="lemariBaju" name="fasilitasKamar[]" value="lemariBaju" class="mr-2" />
+                                <label for="lemariBaju">Lemari Baju</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="klosetDuduk" name="fasilitasKamar[]" value="klosetDuduk" class="mr-2" />
+                                <label for="klosetDuduk">Kloset Duduk</label>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Fasilitas Bersama Section -->
+                    <div id="fasilitasBersama" class="hidden">
+                        <label class="block text-gray-600 mt-4">Fasilitas Bersama</label>
+                        <div class="flex flex-wrap">
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="penjagaKos" name="fasilitasBersama[]" value="penjagaKos" class="mr-2" />
+                                <label for="penjagaKos">Penjaga Kos</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="dispenser" name="fasilitasBersama[]" value="dispenser" class="mr-2" />
+                                <label for="dispenser">Dispenser</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="laundry" name="fasilitasBersama[]" value="laundry" class="mr-2" />
+                                <label for="laundry">Laundry</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kulkas" name="fasilitasBersama[]" value="kulkas" class="mr-2" />
+                                <label for="kulkas">Kulkas</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="tvBersama" name="fasilitasBersama[]" value="tv" class="mr-2" />
+                                <label for="tvBersama">TV</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="dapur" name="fasilitasBersama[]" value="dapur" class="mr-2" />
+                                <label for="dapur">Dapur</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="rKeluarga" name="fasilitasBersama[]" value="rKeluarga" class="mr-2" />
+                                <label for="rKeluarga">R. Keluarga</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="mushola" name="fasilitasBersama[]" value="mushola" class="mr-2" />
+                                <label for="mushola">Mushola</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="mesinCuci" name="fasilitasBersama[]" value="mesinCuci" class="mr-2" />
+                                <label for="mesinCuci">Mesin Cuci</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg">
+                    Simpan
+                </button>
+            </form>
+        </div>
+    </div>
+    </main>
+
+    <script>
+        function confirmDelete(button) {
+            const productId = button.getAttribute("data-productid");  // Get the product ID from the button's data attribute
+            const url = new URL(window.location.href);
+            
+            // Set both the action and product_id parameters in the URL
+            url.searchParams.set('id', productId);
+            url.searchParams.set('action', 'delete');
+            
+            // Update the URL without reloading the page
+            window.history.pushState({}, '', url.toString());
+            
+            // Show the SweetAlert2 confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Perform the delete action
+                    fetch(`/profile/product?id=${productId}&action=delete`, {
+                        method: 'POST',
+                    }).then(response => {
+                        if (response.ok) {
+                            // Show success message
+                            Swal.fire(
+                                'Deleted!',
+                                'Your item has been deleted.',
+                                'success'
+                            ).then(() => {
+                                window.location.reload();  // Reload the page after the success message
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                'There was a problem deleting the item.',
+                                'error'
+                            );
+                        }
+                    }).catch(error => {
+                        // If fetch fails
+                        Swal.fire(
+                            'Error!',
+                            'An unexpected error occurred.',
+                            'error'
+                        );
+                    });
+                    
+                } else if (result.isDismissed) {
+                    // If cancelled, remove the parameters from the URL
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('id');
+                    url.searchParams.delete('action');
+                    window.history.replaceState({}, '', url.toString());  // Update the URL without reloading
+                }
+            });
+        }
+    </script>            
+    <script>
+        function openModalForm(button) {
+            // Remove the 'hidden' class to show the modal
+            document.getElementById("productForm").reset();
+            document.getElementById("promoPriceContainer").classList.add("hidden");
+            document.getElementById("formModal").classList.remove("hidden");
+
+            // Get the data from the button's data-* attributes
+            const productId = button.getAttribute("data-productid");
+            const productName = button.getAttribute("data-name");
+            const productDeskripsi = button.getAttribute("data-deskripsi");
+            const productAddress = button.getAttribute("data-address");
+            const productType = button.getAttribute("data-type");
+            const productPrice = button.getAttribute("data-price");
+            const productPromo = button.getAttribute("data-promo");
+            const productFasilitasK = button.getAttribute("data-fasilitasK");
+            const productFasilitasB = button.getAttribute("data-fasilitasB");
+            const productGambar = button.getAttribute("data-gambar");
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', productId);
+            url.searchParams.set('action', 'edit');
+            window.history.pushState({}, '', url.toString()); 
+
+            const promo = ((productPrice - productPromo) / productPrice) * 100;
+
+            // Set the form fields with the existing data
+            document.getElementById('nameKost').value = productName;
+            document.getElementById('typeKost').value = productType;
+            document.getElementById('deskripsiKost').value = productDeskripsi;
+            document.getElementById('alamatKost').value = productAddress;
+            document.getElementById('priceKost').value = 'Rp ' + parseInt(productPrice).toLocaleString('id-ID');
+            if (productPromo != '0') {
+                document.getElementById('promoKost').value = promo;
+                document.getElementById("promoPriceContainer").classList.remove("hidden");
+                document.getElementById('promoPriceKost').value = 'Rp ' + parseInt(productPromo).toLocaleString('id-ID');
+            } else {
+                document.getElementById('promoKost').value = '';
+            }
+
+            // Assuming the facilities are stored as a comma-separated string, you can split and check the checkboxes:
+            const fasilitasKamar = productFasilitasK ? productFasilitasK.split(',') : [];
+            const fasilitasBersama = productFasilitasB ? productFasilitasB.split(',') : [];
+
+            // Set the checkboxes for fasilitas kamar
+            const fasilitasKamarCheckboxes = document.querySelectorAll('#fasilitasKamar input[type="checkbox"]');
+            fasilitasKamarCheckboxes.forEach(checkbox => {
+                if (fasilitasKamar.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+            });
+
+            // Set the checkboxes for fasilitas bersama
+            const fasilitasBersamaCheckboxes = document.querySelectorAll('#fasilitasBersama input[type="checkbox"]');
+            fasilitasBersamaCheckboxes.forEach(checkbox => {
+                if (fasilitasBersama.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+            });
+            
+            // Hide the alert messages
+            document.querySelectorAll('.text-red-600').forEach(span => span.classList.add('hidden'));
+        }
+
+        function closeModalForm() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('id');
+            url.searchParams.delete('action');
+            window.history.replaceState({}, '', url.toString());
+
+            document.getElementById("formModal").classList.add("hidden");
+        }
+    </script>
+    <script>
+        function formatCurrency(input) {
+            // Remove all non-numeric characters, except for an optional decimal point
+            let value = input.value.replace(/[^0-9]/g, '');
+            let numberValue = parseInt(value, 10);
+
+            if (!isNaN(numberValue)) {
+            // Format the number with comma separators and add "Rp" prefix
+                input.value = 'Rp ' + numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            } else {
+                input.value = ''; // Clear the input if not a number
+            }
+        }
+        function updatePromoPrice() {
+            const priceKost = parseFloat(document.getElementById('priceKost').value.replace(/[^0-9]/g, '')) || 0; // Get the cost price
+            let promoKost = parseFloat(document.getElementById('promoKost').value) || 0; // Get the promo amount
+
+            if (promoKost > 100) {
+                promoKost = 100
+                document.getElementById('promoKost').value = 100; // Set value to 100 if exceeded
+            } else if (isNaN(promoKost) || promoKost < 0) {
+                document.getElementById('promoKost').value = ''; // Clear the input if the value is not a valid number or negative
+            }
+
+            const discountAmount = (priceKost * promoKost) / 100; // Calculate the discount amount based on the percentage
+            const finalPrice = priceKost - discountAmount; // Calculate the final price after discount
+
+            // Update the "Harga Setelah Promo" field
+            document.getElementById('promoPriceKost').value = "Rp " + finalPrice.toLocaleString('id-ID'); // Ensure it doesn't go below 0
+        }
+        // Function to check promo fields and update UI
+        function checkPromoFields() {
+            const priceKost = document.getElementById("priceKost").value;
+            const promoKost = document.getElementById("promoKost").value;
+            const promoPriceContainer = document.getElementById("promoPriceContainer");
+            const promoAlert = document.getElementById("promoAlert");
+
+            // Show promotional price field if both price and promo are filled
+            if (priceKost && promoKost) {
+                promoPriceContainer.classList.remove("hidden");
+                promoAlert.classList.add("hidden"); // Hide alert
+            } else {
+                promoPriceContainer.classList.add("hidden");
+                promoAlert.classList.remove("hidden"); // Show alert if promo field is not filled
+            }
+        }
+
+        // Attach event listeners to input fields to check on input
+        document.getElementById("priceKost").addEventListener("input", checkPromoFields);
+        document.getElementById("promoKost").addEventListener("input", checkPromoFields);
+    </script>   
+    <script>
+        function toggleFacilities() {
+            const selectedValue = document.getElementById('infoKost').value;
+            const fasilitasKamar = document.getElementById('fasilitasKamar');
+            const fasilitasBersama = document.getElementById('fasilitasBersama');
+    
+            if (selectedValue === 'fasilitasK') {
+                fasilitasKamar.classList.remove('hidden');
+                fasilitasBersama.classList.add('hidden');
+            } else {
+                fasilitasKamar.classList.add('hidden');
+                fasilitasBersama.classList.remove('hidden');
+            }
+        }
+    </script>  
+    <script>
+        function validateForm(event) {
+            event.preventDefault(); // Prevent form submission
+    
+            // Hide previous error messages
+            document.querySelectorAll('.text-red-600').forEach(alert => alert.classList.add('hidden'));
+    
+            let isValid = true;
+    
+            // Check Nama Kost
+            const nameKost = document.getElementById('nameKost').value;
+            if (!nameKost) {
+                document.getElementById('nameKostAlert').classList.remove('hidden');
+                isValid = false;
+            }
+    
+            // Check Kelas Kost
+            const typeKost = document.getElementById('typeKost').value;
+            if (!typeKost) {
+                document.getElementById('typeKostAlert').classList.remove('hidden');
+                isValid = false;
+            }
+    
+            // Check Alamat Kost
+            const alamatKost = document.getElementById('alamatKost').value;
+            if (!alamatKost) {
+                document.getElementById('alamatKostAlert').classList.remove('hidden');
+                isValid = false;
+            }
+    
+            // Check Deskripsi Kost
+            const deskripsiKost = document.getElementById('deskripsiKost').value;
+            if (!deskripsiKost) {
+                document.getElementById('deskripsiKostAlert').classList.remove('hidden');
+                isValid = false;
+            }
+    
+            // Check Harga Kost
+            const priceKost = document.getElementById('priceKost').value;
+            if (!priceKost) {
+                document.getElementById('priceKostAlert').classList.remove('hidden');
+                isValid = false;
+            }
+    
+            // If form is valid, proceed with the fetch and FormData
+            if (isValid) {
+                const formData = new FormData();
+    
+                // Append form data to FormData object
+                formData.append('nameKost', nameKost);
+                formData.append('typeKost', typeKost);
+                formData.append('alamatKost', alamatKost);
+                formData.append('deskripsiKost', deskripsiKost);
+                formData.append('priceKost', priceKost);
+    
+                const promoKost = document.getElementById('promoKost').value;
+                const promoPriceKost = document.getElementById('promoPriceKost').value;
+                formData.append('promoKost', promoKost);
+                formData.append('promoPriceKost', promoPriceKost);
+    
+                // Handle the selected checkboxes for facilities
+                const fasilitasKamar = [];
+                const fasilitasBersama = [];
+                const fasilitasKCheckboxes = document.getElementsByName('fasilitasKamar[]');
+                const fasilitasBCheckboxes = document.getElementsByName('fasilitasBersama[]');
+    
+                fasilitasKCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        fasilitasKamar.push(checkbox.value);
+                    }
+                });
+    
+                fasilitasBCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        fasilitasBersama.push(checkbox.value);
+                    }
+                });
+    
+                formData.append(`fasilitasKamar`, fasilitasKamar)
+                formData.append(`fasilitasBersama`, fasilitasBersama)
+
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const id = urlParams.get('id');
+                    // Make the POST request
+                    fetch(`/profile/product?id=${id}&action=edit`, {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    document.getElementById("formModal").classList.add("hidden");
+
+                    Swal.fire({
+                        title: 'Produk Berhasil Diedit',
+                        icon: 'success',
+                        confirmButtonText: 'Oke'
+                    }).then(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.delete('id');
+                        url.searchParams.delete('action');
+                        window.history.replaceState({}, '', url.toString());
+                        window.location.reload();
+                    })
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengunggah. Silakan coba lagi.');
+                }
+            }
+    
+            return isValid; // Return false to prevent form submission if not valid
+        }
+    </script>    
+  </body>
+</html>

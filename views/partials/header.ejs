@@ -1,0 +1,345 @@
+<style>
+  @media (min-width: 768px) {
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+  }
+</style>
+<body class="font-sans antialiased bg-gray-100">
+  <% if (!session.user_id) { %>
+      <header
+        class="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-500 to-purple-600 shadow z-50"
+      >
+        <div
+          class="container mx-auto px-4 py-4 flex justify-between items-center"
+      >
+      <a href="/">
+        <img src="/assets/images/logo.png" width="117px" height="117px">
+      </a>
+      <div class="hidden md:flex">
+        <a
+          href="/login"
+          class="ml-4 px-4 py-2 text-white hover:text-yellow-300"
+          >Log In</a
+        >
+        <a
+          href="/register"
+          class="ml-4 px-4 py-2 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-400"
+          >Register</a
+        >
+      </div>
+      <button
+        class="md:hidden text-white hover:text-yellow-300"
+        id="menu-button"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="hidden md:hidden" id="mobile-menu">
+      <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+        <div class="relative dropdown">
+          <a></a>
+          <a
+            href="/login"
+            class="block px-3 py-2 rounded-md text-base font-medium text-blue-500 bg-white hover:bg-gray-200"
+            >Log In</a
+          >
+          <a
+            href="/register"
+            class="block px-3 py-2 mt-4 rounded-md text-base font-medium text-blue-500 bg-yellow-300 hover:bg-yellow-400"
+            >Register</a
+          >
+        </div>
+      </nav>
+    </div>
+  </header>
+  <% } else { %>
+  <header
+    class="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-500 to-purple-600 shadow z-50"
+  >
+    <div
+      class="container mx-auto px-4 py-4 flex justify-between items-center"
+    >
+      <a href="/">
+        <img src="/assets/images/logo.png" width="117px" height="117px">
+      </a>
+
+      <!-- Navigation for large screens -->
+      <nav class="hidden md:flex items-center space-x-20">
+        <!-- Kelas Kost Dropdown -->
+        <div class="relative dropdown">
+          <a
+            href="#"
+            class="block px-3 py-2 text-white hover:text-yellow-300 flex items-center"
+            id="kelas-kost-link"
+            >Kelas Kost
+            <!-- Dropdown icon -->
+            <svg
+              class="w-4 h-4 ml-1 dropdown-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </a>
+          <div
+            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50 right-5"
+          >
+            <a href="/category/kost-pria" 
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Pria</a
+            >
+            <a
+              href="/category/kost-wanita"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Wanita</a
+            >
+            <a
+              href="/category/kost-eksklusif"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Eksklusif</a
+            >
+          </div>
+        </div>
+
+        <a
+          href="/category/promo"
+          class="block py-2 text-white hover:text-yellow-300"
+          >Promo</a
+        >
+        <a
+          href="/about"
+          class="block py-2 text-white hover:text-yellow-300"
+          >Tentang Kami</a
+        >
+      </nav>
+
+      <!-- User dropdown with profile photo for logged-in user -->
+      <div class="hidden md:flex">
+        <div class="relative dropdown">
+          <a
+            href="#"
+            class="mr-2 px-3 py-2 text-white hover:text-yellow-300 flex items-center"
+            id="user-dropdown-link"
+          >
+            <%= user.user_name %>
+            <img
+              src='<%= user.user_profile %>'
+              alt="Profile Photo"
+              class="w-10 h-10 rounded-full object-cover ml-2"
+              id="user-profile-photo"
+            />
+          </a>
+          <div
+            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50 right-5"
+          >
+            <a
+              href="/profile"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Profile</a
+            >
+            <% if(user.user_premium == 'yes') { %>
+              <a
+                href="/profile/product"
+                class="block px-3 py-2 hover:bg-gray-200"
+                >Product Saya</a
+              >
+            <% } %>
+            <a
+              href="/profile/history"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >History Pembayaran</a
+            >
+            <a
+              href="/logout"
+              id="logout-link"
+              class="block px-3 py-2 hover:bg-gray-200 text-red-600"
+              >Logout</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button
+        class="md:hidden text-white hover:text-yellow-300"
+        id="menu-button"
+      >
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16m-7 6h7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="hidden md:hidden" id="mobile-menu">
+      <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+        <!-- nama pengguna -->
+        <div class="relative dropdown">
+          <a
+            href="#"
+            class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-300 flex items-center"
+            id="user-dropdown-link"
+          >
+            <%= user.user_name %>
+            <!-- Profile photo -->
+            <img
+              src='<%= user.user_profile %>'
+              alt="Profile Photo"
+              class="w-12 h-12 rounded-full object-cover ml-auto"
+            />
+          </a>
+
+          <div
+            class="hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50"
+          >
+            <a
+              href="/profile"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Profile</a
+            >
+            <% if(user.user_premium == 'yes') { %>
+              <a
+                href="/profile/product"
+                class="block px-3 py-2 hover:bg-gray-200"
+                >Product Saya</a
+              >
+            <% } %>
+            <a
+              href="/profile/history"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >History Pembayaran</a
+            >
+            <a
+              href="/logout"
+              class="block px-3 py-2 hover:bg-gray-200 text-red-600"
+              >Logout</a
+            >
+          </div>
+        </div>
+
+        <!-- Kelas Kost Dropdown for Mobile -->
+        <div class="relative dropdown">
+          <a
+            href="#"
+            class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-300 flex items-center"
+            id="kelas-kost-link"
+            >Kelas Kost
+            <!-- Dropdown icon -->
+            <svg
+              class="w-4 h-4 ml-1 dropdown-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </a>
+          <div
+            class="hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50"
+          >
+            <a href="/category/kost-pria"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Pria</a
+            >
+            <a
+              href="/category/kost-wanita"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Wanita</a
+            >
+            <a
+              href="/category/kost-eksklusif"
+              class="block px-3 py-2 hover:bg-gray-200"
+              >Eksklusif</a
+            >
+          </div>
+        </div>
+
+        <a
+          href="/category/promo"
+          class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-300"
+          >Promo</a
+        >
+        <a
+          href="/about"
+          class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-yellow-300"
+          >Tentang Kami</a
+        >
+      </nav>
+    </div>
+  </header>
+  <% } %>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Get all dropdown elements
+      const dropdowns = document.querySelectorAll(".dropdown");
+
+      dropdowns.forEach(dropdown => {
+        const dropdownLink = dropdown.querySelector("a");
+        const dropdownMenu = dropdown.querySelector(".dropdown-menu");
+
+        // Toggle dropdown on click
+        dropdownLink.addEventListener("click", function (e) {
+          e.preventDefault();  // Prevent default action (e.g., page reload)
+          dropdownMenu.classList.toggle("hidden");  // Show or hide the menu
+        });
+
+        // Hide dropdown when clicking outside of it
+        window.addEventListener("click", function (e) {
+          if (!dropdown.contains(e.target)) {
+            dropdownMenu.classList.add("hidden");
+          }
+        });
+      });
+      document
+      .getElementById("menu-button")
+      .addEventListener("click", function () {
+        var menu = document.getElementById("mobile-menu");
+        if (menu.classList.contains("hidden")) {
+          menu.classList.remove("hidden");
+        } else {
+          menu.classList.add("hidden");
+        }
+      });
+    });
+  </script>
+</body>

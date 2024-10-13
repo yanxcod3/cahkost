@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+      #profileInput {
+      display: none;
+    }
+
+    /* Tombol kustom untuk mengganti input file */
+    .custom-file-upload {
+      display: inline-block;
+      padding: 8px 15px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    /* Hover effect untuk tombol */
+    .custom-file-upload:hover {
+      background-color: #2980b9;
+    }
+    </style>
+  </head>
+  
+  <body
+    class="bg-gradient-to-r from-indigo-600 to-blue-300 min-h-screen flex items-center justify-center p-4"
+  >
+    <% if(alert == 'Update Success') { %>
+        <script>
+          Swal.fire({
+            title: 'Profile Update!',
+            text: 'Profile anda telah disimpan.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() =>{
+            window.location.href = '/profile'
+          })
+        </script>
+      <% } else if(alert == 'Password Wrong') { %>
+        <script>
+          Swal.fire({
+            title: 'Password Wrong!',
+            text: 'Password lama anda salah.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          }).then(() =>{
+            window.location.href = '/profile/edit'
+          })
+        </script>
+      <% } %>
+    <div
+      class="w-full max-w-4xl bg-gray-900 rounded-lg shadow-lg overflow-hidden"
+    >
+      <%- include('edit') %>
+
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('upload-form').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent form submission to handle validation first
+        
+        const ktpInput = document.getElementById('ktp');
+        const selfieInput = document.getElementById('selfie');
+        const ktpError = document.getElementById('ktp-error');
+        const selfieError = document.getElementById('selfie-error');
+        
+        let isValid = true;
+
+        // Check if KTP file is selected
+        if (!ktpInput.files.length) {
+          ktpError.classList.remove('hidden');
+          isValid = false;
+        }
+
+        // Check if selfie file is selected
+        if (!selfieInput.files.length) {
+          selfieError.classList.remove('hidden');
+          isValid = false;
+        }
+
+        // If all validations are passed, submit the form
+        if (isValid) {
+          document.getElementById("modal").classList.add("hidden");
+          Swal.fire({
+              title: 'Upload Dokumen Berhasil',
+              icon: 'success',
+              confirmButtonText: 'Oke'
+          }).then (() => {
+            this.submit(); // Submit the form
+          })
+        }
+      });
+
+      document
+        .getElementById("openModal")
+        .addEventListener("click", function () {
+          document.getElementById("modal").classList.remove("hidden");
+        });
+
+      document
+        .getElementById("close-modal")
+        .addEventListener("click", function () {
+          document.getElementById("modal").classList.add("hidden");
+          document.getElementById('upload-form').reset();
+          document.getElementById('ktp-error').classList.add('hidden');
+          document.getElementById('selfie-error').classList.add('hidden');
+        });
+    </script>
+    <script>
+      function togglePasswordVisibility1() {
+        const passwordInput = document.getElementById('password');
+        const eyeIconOpen = document.getElementById('eye-icon-open1');
+        const eyeIconClosed = document.getElementById('eye-icon-closed1');
+    
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeIconOpen.classList.add('hidden');
+          eyeIconClosed.classList.remove('hidden');
+        } else {
+          passwordInput.type = 'password';
+          eyeIconOpen.classList.remove('hidden');
+          eyeIconClosed.classList.add('hidden');
+        }
+      }
+      function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('new-password');
+        const eyeIconOpen = document.getElementById('eye-icon-open');
+        const eyeIconClosed = document.getElementById('eye-icon-closed');
+    
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeIconOpen.classList.add('hidden');
+          eyeIconClosed.classList.remove('hidden');
+        } else {
+          passwordInput.type = 'password';
+          eyeIconOpen.classList.remove('hidden');
+          eyeIconClosed.classList.add('hidden');
+        }
+      }
+      function togglePasswordVisibilityy() {
+        const passwordInput = document.getElementById('confirm-password');
+        const eyeIconOpen = document.getElementById('eye-icon-openn');
+        const eyeIconClosed = document.getElementById('eye-icon-closedd');
+    
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+          eyeIconOpen.classList.add('hidden');
+          eyeIconClosed.classList.remove('hidden');
+        } else {
+          passwordInput.type = 'password';
+          eyeIconOpen.classList.remove('hidden');
+          eyeIconClosed.classList.add('hidden');
+        }
+      }
+    </script>
+    <script>
+      function togglePasswordFields() {
+      const checkbox = document.getElementById('change-password-checkbox');
+      const passwordFields = document.getElementById('change-password-fields');
+      const password = document.getElementById('password');
+      const newPassword = document.getElementById('new-password');
+      const confirmPassword = document.getElementById('confirm-password');
+
+      if (checkbox.checked) {
+        passwordFields.classList.remove('hidden');
+      } else {
+        passwordFields.classList.add('hidden');
+        // Reset password fields
+        password.value = '';
+        newPassword.value = '';
+        confirmPassword.value = '';
+      }
+    }
+    function validateForm() {
+      const checkbox = document.getElementById("change-password-checkbox");
+      const nama = document.getElementById("name").value;
+      const nohp = document.getElementById("phone").value;
+      const gender = document.getElementById("gender").value;
+      const faculty = document.getElementById("faculty").value;
+      const password = document.getElementById("new-password").value;
+      const newPassword = document.getElementById("new-password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+
+      if (nama.length > 100) {
+        Swal.fire({
+            title: 'Character Limits!',
+            text: 'Karakter Nama Lengkap terlalu panjang, max 100.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return false;
+      }
+      if (nohp.length > 15) {
+        Swal.fire({
+            title: 'Number Limits!',
+            text: 'Karakter Nomor HP terlalu panjang, max 15.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return false;
+      }
+      if (checkbox.checked) {
+        if (password === "" || newPassword === "" || confirmPassword === "") {
+          Swal.fire({
+            title: 'Password Not Field!',
+            text: 'Semua kolom password harus di isi.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return false; // Prevent form submission
+        } 
+        if (newPassword.length < 8) {
+          Swal.fire({
+            title: 'Password Minimum!',
+            text: 'Password yang anda input kurang dari 8 karakter.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return false;
+        }
+        if (newPassword !== confirmPassword) {
+          Swal.fire({
+            title: 'Password Not Same!',
+            text: 'Password yang anda input berbeda.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return false; // Prevent form submission
+        }
+      }
+      return true; // Allow form submission if everything is correct
+    }
+    </script>
+    <script>
+      document.getElementById('premium').addEventListener('click', function() {
+        Swal.fire({
+            title: 'Premium Account!',
+            text: 'Akun anda sudah premium.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    });
+    </script>
+    <script>
+      document.getElementById('profileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0]; // Get the selected file
+        const maxSizeInMB = 3; // Max file size limit in MB
+        const maxSizeInBytes = maxSizeInMB * 1024 * 1024; // Convert MB to Bytes
+
+        if (file && file.size > maxSizeInBytes) {
+          Swal.fire({
+            title: 'File Size Exceeds!',
+            text: `Ukuran file melebihi batas, max ${maxSizeInMB}mb.`,
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          })
+          return event.target.value = ''; // Reset the input value
+        }
+        previewProfileImage(event); // Call the function to preview the image if size is okay
+      });
+      // Fungsi untuk Pratinjau Gambar
+      function previewProfileImage(event) {
+        const image = document.getElementById("profile");
+        const file = event.target.files[0];
+    
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            image.src = e.target.result; // Set gambar pratinjau
+          }
+          reader.readAsDataURL(file); // Membaca file gambar
+        }
+      }
+    </script>
+  </body>
+</html>

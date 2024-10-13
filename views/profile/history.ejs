@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+  </head>
+  <body
+    class="bg-gradient-to-r from-purple-600 via-blue-500 to-purple-700 min-h-screen flex items-center justify-center p-4"
+  >
+    <div class="w-full max-w-7xl bg-white rounded-lg shadow-lg p-6 space-y-6">
+      <h1 class="text-3xl font-bold text-center text-gray-800">
+        History Pembayaran Sewa
+        <span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+        >
+          CahKost
+        </span>
+      </h1>
+
+      <!-- Filter Tahun and Export PDF buttons -->
+      <div
+        class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4"
+      >
+        <div class="w-full md:w-auto">
+          <label for="sortOrder" class="block text-sm font-medium text-gray-700 mb-1">Sort By:</label>
+          <select id="sortOrder" class="w-full md:w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <option value="terbaru">Terbaru</option>
+              <option value="terlama">Terlama</option>
+          </select>
+        </div>
+        <button
+          onclick="exportPDF()"
+          class="w-full md:w-auto bg-red-500 hover:bg-red-900 text-white text-sm py-2 px-4 rounded transition duration-300 ease-in-out"
+        >
+          Export PDF
+        </button>
+      </div>
+
+      <!-- Tabel Riwayat Pembayaran -->
+      <div class="overflow-x-auto">
+        <table
+          id="historyTable"
+          class="min-w-full bg-white border border-gray-200 rounded-lg shadow-md"
+        >
+          <thead class="bg-gray-50 border-b border-gray-300">
+            <tr>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Nomor Transaksi</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Tanggal Transaksi</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Durasi Sewa</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Nama Kost</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Nominal</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Waktu Pembayaran</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Status</th>
+              <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-r border-gray-300">Invoice</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <% order.forEach(function(data) { %>
+              <tr class="border-b border-gray-300 hover:bg-gray-100">
+                <td class="px-4 py-2 text-center border-r border-gray-300"><%= data.order_id %></td>
+                <td class="tanggal px-4 py-2 text-center border-r border-gray-300"><%= data.order_date %></td>
+                <td class="px-4 py-2 text-center border-r border-gray-300"><%= data.order_masa %></td>
+                <td class="px-4 py-2 text-center border-r border-gray-300"><%= data.product_name %></td>
+                <td class="px-4 py-2 text-center border-r border-gray-300">Rp <%= data.order_price.toLocaleString('id-ID') %></td>
+                <td class="px-4 py-2 text-center border-r border-gray-300"><%= data.order_pembayaran %></td>
+                <td class="px-4 py-2 text-center border-r border-gray-300">
+                  <% if (data.order_status === 'pending') { %>
+                    <a href="https://app.sandbox.midtrans.com/snap/v4/redirection/<%= data.order_token %>" target="_blank">
+                      <button class="w-32 bg-yellow-500 font-bold text-white px-2 py-1 rounded">PENDING</button>
+                    </a>
+                  <% } else if (data.order_status === 'capture') { %>
+                    <button class="w-32 bg-blue-500 font-bold text-white px-2 py-1 rounded">CAPTURED</button>
+                  <% } else if (data.order_status === 'settlement') { %>
+                    <button class="w-32 bg-green-500 font-bold text-white px-2 py-1 rounded">SUKSES</button>
+                  <% } else if (data.order_status === 'deny') { %>
+                    <button class="w-32 bg-orange-500 font-bold text-white px-2 py-1 rounded">DENIED</button>
+                  <% } else if (data.order_status === 'cancel') { %>
+                    <button class="w-32 bg-pink-500 font-bold text-white px-2 py-1 rounded">CANCELLED</button>
+                  <% } else if (data.order_status === 'expire') { %>
+                    <button class="w-32 bg-gray-500 font-bold text-white px-2 py-1 rounded">EXPIRED</button>
+                  <% } else if (data.order_status === 'failure') { %>
+                    <button class="w-32 bg-red-500 font-bold text-white px-2 py-1 rounded">FAILED</button>
+                  <% } else if (data.order_status === 'refund') { %>
+                    <button class="w-32 bg-purple-500 font-bold text-white px-2 py-1 rounded">REFUNDED</button>
+                  <% } else if (data.order_status === 'partial_refund') { %>
+                    <button class="w-32 bg-indigo-500 font-bold text-white px-2 py-1 rounded">PARTIAL REFUND</button>
+                  <% } else if (data.order_status === 'chargeback') { %>
+                    <button class="w-32 bg-red-600 font-bold text-white px-2 py-1 rounded">CHARGEBACK</button>
+                  <% } else if (data.order_status === 'partial_chargeback') { %>
+                    <button class="w-32 bg-red-400 font-bold text-white px-2 py-1 rounded">PARTIAL CHARGEBACK</button>
+                  <% } %>                  
+                </td>
+                <td class="flex items-center justify-center px-4 py-2 border-r border-gray-300">
+                  <button onclick="generateInvoice('<%= data.order_id %>', '<%= data.order_date %>', '<%= data.order_masa %>', '<%= data.product_name %>', '<%= data.order_price %>', '<%= data.order_pembayaran %>', '<%= data.order_status %>')" style="background: none; border: none; padding: 0; cursor: pointer;">
+                    <svg id="fi_7268609" enable-background="new 0 0 515.283 515.283" width="24" height="24" viewBox="0 0 515.283 515.283" xmlns="http://www.w3.org/2000/svg">
+                        <g>
+                            <g>
+                                <g>
+                                    <g>
+                                        <path d="m400.775 515.283h-286.268c-30.584 0-59.339-11.911-80.968-33.54-21.628-21.626-33.539-50.382-33.539-80.968v-28.628c0-15.811 12.816-28.628 28.627-28.628s28.627 12.817 28.627 28.628v28.628c0 15.293 5.956 29.67 16.768 40.483 10.815 10.814 25.192 16.771 40.485 16.771h286.268c15.292 0 29.669-5.957 40.483-16.771 10.814-10.815 16.771-25.192 16.771-40.483v-28.628c0-15.811 12.816-28.628 28.626-28.628s28.628 12.817 28.628 28.628v28.628c0 30.584-11.911 59.338-33.54 80.968-21.629 21.629-50.384 33.54-80.968 33.54zm-143.134-114.509c-3.96 0-7.73-.804-11.16-2.257-3.2-1.352-6.207-3.316-8.838-5.885-.001-.001-.001-.002-.002-.002-.019-.018-.038-.037-.057-.056-.005-.004-.011-.011-.016-.016-.016-.014-.03-.029-.045-.044-.01-.01-.019-.018-.029-.029-.01-.01-.023-.023-.032-.031-.02-.02-.042-.042-.062-.062l-114.508-114.509c-11.179-11.179-11.179-29.305 0-40.485 11.179-11.179 29.306-11.18 40.485 0l65.638 65.638v-274.409c-.001-15.811 12.815-28.627 28.626-28.627s28.628 12.816 28.628 28.627v274.408l65.637-65.637c11.178-11.179 29.307-11.179 40.485 0 11.179 11.179 11.179 29.306 0 40.485l-114.508 114.507c-.02.02-.042.042-.062.062-.011.01-.023.023-.032.031-.01.011-.019.019-.029.029-.014.016-.03.03-.044.044-.005.005-.012.012-.017.016-.018.019-.037.038-.056.056-.001 0-.001.001-.002.002-.315.307-.634.605-.96.895-2.397 2.138-5.067 3.805-7.89 4.995-.01.004-.018.008-.028.012-.011.004-.02.01-.031.013-3.412 1.437-7.158 2.229-11.091 2.229z" fill="rgb(0,0,0)"></path>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </svg>
+                </button>                
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div id="paginationControls" class="flex justify-between items-center mt-4" style="display: none;">
+        <button id="prevPage" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" onclick="prevPage()">Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" onclick="nextPage()">Next</button>
+      </div>
+
+      <p class="mt-6 text-center text-sm text-gray-500">
+        Kembali ke
+        <a
+          href="/"
+          class="font-medium text-indigo-900 hover:text-indigo-200"
+          >Beranda</a
+        >
+      </p>
+
+      <div
+        id="pdfSuccessMessage"
+        class="hidden text-center text-green-500 font-bold mt-4"
+      >
+        File PDF berhasil diunduh!
+      </div>
+
+      <script>
+        // Daftar bulan dalam bahasa Indonesia beserta indeks angkanya
+        const months = {
+            "Januari": "01",
+            "Februari": "02",
+            "Maret": "03",
+            "April": "04",
+            "Mei": "05",
+            "Juni": "06",
+            "Juli": "07",
+            "Agustus": "08",
+            "September": "09",
+            "Oktober": "10",
+            "November": "11",
+            "Desember": "12"
+        };
+
+        // Function untuk convert tanggal dari format 'd MMMM yyyy, HH:mm WIB' ke format Date object
+        function convertToDate(dateStr) {
+            const [datePart, timePart] = dateStr.split(', '); // Pisahkan tanggal dan waktu
+            const [day, monthName, year] = datePart.split(' '); // Pisahkan hari, bulan, tahun
+            const month = months[monthName]; // Mengubah nama bulan menjadi angka
+            const [hours, minutes] = timePart.replace(' WIB', '').split(':'); // Pisahkan jam dan menit, abaikan 'WIB'
+            
+            // Gabungkan menjadi Date object
+            return new Date(`${year}-${month}-${day.padStart(2, '0')}T${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:00`);
+        }
+
+        // Function untuk sorting berdasarkan tanggal
+        function sortTransactions(order = 'terbaru') {
+            const rows = Array.from(document.querySelectorAll('tbody tr')); // Mendapatkan semua baris transaksi
+            const sortedRows = rows.sort((rowA, rowB) => {
+                const dateA = convertToDate(rowA.querySelector('.tanggal').innerText);
+                const dateB = convertToDate(rowB.querySelector('.tanggal').innerText);
+
+                return order === 'terbaru' ? dateB - dateA : dateA - dateB; // Sort by date
+            });
+
+            // Clear the table body before appending sorted rows
+            const tbody = document.querySelector('tbody');
+            tbody.innerHTML = ''; // Clear existing rows
+            sortedRows.forEach(row => tbody.appendChild(row)); // Append sorted rows
+
+            return sortedRows; // Return sorted rows for pagination
+        }
+
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 5;
+        let sortedRows = []; // Store sorted rows
+        let totalPages = 0;
+
+        // Function to display rows for pagination
+        function displayRows(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            sortedRows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+
+            document.getElementById("pageInfo").textContent = `Page ${page} of ${totalPages}`;
+            document.getElementById("prevPage").disabled = page === 1;
+            document.getElementById("nextPage").disabled = page === totalPages;
+        }
+
+        window.onload = () => {
+            const order = document.getElementById('sortOrder').value; // Get the initial sort order
+            sortedRows = sortTransactions(order); // Sort on load
+            totalPages = Math.ceil(sortedRows.length / rowsPerPage); // Calculate total pages
+            displayRows(currentPage); // Initial display
+              const paginationControls = document.getElementById('paginationControls');
+              if (sortedRows.length > 5) {
+                paginationControls.style.display = 'flex';
+              } else {
+                paginationControls.style.display = 'none'; // Sembunyikan jika data kurang dari 5
+              }
+        };
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayRows(currentPage);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayRows(currentPage);
+            }
+        }
+
+        // Add event listener for sort order change
+        document.getElementById('sortOrder').addEventListener('change', (event) => {
+            const order = event.target.value; // 'terbaru' or 'terlama'
+            sortedRows = sortTransactions(order); // Re-sort based on selection
+            totalPages = Math.ceil(sortedRows.length / rowsPerPage); // Recalculate total pages
+            currentPage = 1; // Reset to first page
+            displayRows(currentPage); // Update display
+        });
+      </script>
+      <script>
+          function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFont("helvetica", "bold"); // Mengatur font menjadi bold
+            doc.text("HISTORY PEMBAYARAN SEWA KOST", 55, 50);
+
+            // Ambil nilai filter dari dropdown
+            const sortOrder = document.getElementById("sortOrder").value;
+
+            // Ambil baris tabel
+            const tableRows = document.querySelectorAll("#historyTable tbody tr");
+            let rows = [];
+
+            // Kumpulkan data baris
+            tableRows.forEach(function (row) {
+                let cols = [];
+                let isEmptyRow = true; // Flag untuk memeriksa apakah ada data di baris ini
+
+                row.querySelectorAll("td").forEach(function (col) {
+                    const cellText = col.innerText.trim(); // Ambil teks dan hilangkan spasi di awal/akhir
+                    cols.push(cellText.length > 0 ? cellText : "-"); // Jika kosong, isi dengan "-"
+                    if (cellText.length > 0) isEmptyRow = false; // Jika ada data, tandai baris tidak kosong
+                });
+
+                // Hanya tambahkan baris jika ada data
+                if (!isEmptyRow) {
+                    rows.push(cols);
+                }
+            });
+
+            // Urutkan baris berdasarkan pilihan filter
+            if (sortOrder === "terbaru") {
+                rows.sort((a, b) => new Date(b[1]) - new Date(a[1])); // Urutkan berdasarkan tanggal descending
+            } else if (sortOrder === "terlama") {
+                rows.sort((a, b) => new Date(a[1]) - new Date(b[1])); // Urutkan berdasarkan tanggal ascending
+            }
+
+            // Buat tabel PDF
+            doc.autoTable({
+                startY: 60, // Posisi tabel di bawah judul
+                head: [
+                    [
+                        "Nomor Transaksi",
+                        "Tanggal Transaksi",
+                        "Durasi Sewa",
+                        "Nama Kost",
+                        "Nominal",
+                        "Waktu Pembayaran",
+                        "Status"
+                    ],
+                ],
+                body: rows,
+                theme: "grid", // Menambahkan garis grid ke tabel
+                headStyles: {
+                    fillColor: [63, 81, 181], // Warna latar belakang header (biru)
+                    textColor: [255, 255, 255], // Warna teks header (putih)
+                    fontStyle: "bold",
+                    halign: "center",
+                },
+                bodyStyles: {
+                    textColor: [0, 0, 0], // Warna teks body (hitam)
+                    halign: "center",
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 240, 240], // Warna baris alternatif (abu-abu terang)
+                },
+                styles: {
+                    lineColor: [0, 0, 0], // Warna border (hitam)
+                    lineWidth: 0.5,
+                },
+                margin: { top: 60 }, // Margin atas untuk tabel
+            });
+
+            doc.save("history_pembayaran.pdf");
+
+            // Tampilkan pesan sukses setelah PDF diunduh
+            const successMessage = document.getElementById("pdfSuccessMessage");
+            successMessage.classList.remove("hidden");
+
+            // Sembunyikan pesan setelah beberapa detik
+            setTimeout(() => {
+                successMessage.classList.add("hidden");
+            }, 3000);
+        }
+        function generateInvoice(orderID, tanggal_transaksi, durasi, nama_kost, nominal, waktu_pembayaran, status) {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+
+          if (status === 'pending') {
+              status = 'Menunggu Pembayaran';
+          } else if (status === 'capture') {
+              status = 'Diterima';
+          } else if (status === 'settlement') {
+              status = 'Sukses';
+          } else if (status === 'refund') {
+              status = 'Dikembalikan';
+          } else if (status === 'partial_refund') {
+              status = 'Dikembalikan Sebagian';
+          } else if (status === 'chargeback') {
+              status = 'Chargeback';
+          } else if (status === 'partial_chargeback') {
+              status = 'Chargeback Sebagian';
+          } else if (status === 'deny') {
+              status = 'Ditolak';
+          } else if (status === 'cancel') {
+              status = 'Dibatalkan';
+          } else if (status === 'expire') {
+              status = 'Kedaluwarsa';
+          } else if (status === 'failed') {
+              status = 'Gagal';
+          } else {
+              status = 'Status Tidak Diketahui';
+          }
+
+          // Tambahkan background pada header "CAHKOST"
+          const pageWidth = doc.internal.pageSize.getWidth();
+          doc.setFillColor(63, 81, 181); // Warna background abu-abu
+          doc.rect(0, 10, pageWidth, 20, 'F'); // Membuat kotak yang penuh sepanjang lebar halaman
+
+          // Header "CAHKOST" dengan background
+          doc.setFontSize(22);
+          doc.setTextColor(255, 255, 255); // Warna teks putih
+          doc.setFont("helvetica", "bold"); // Mengatur font menjadi bold
+          doc.text("INVOICE PEMBAYARAN", pageWidth / 2, 25, { align: "center" });
+
+          // Isi invoice dijadikan text-left tapi berada di tengah
+          doc.setFontSize(12);
+          const leftMargin = pageWidth / 4; // Margin kiri untuk menempatkan text di tengah tapi rata kiri
+          doc.setTextColor(0, 0, 0); // Warna teks hitam
+
+          // Define a fixed width for the labels
+          const labelWidth = 50; // Adjust as necessary for your layout
+
+          doc.text("INVOICE ID", leftMargin, 50);
+          doc.text(": " + orderID, leftMargin + labelWidth, 50);
+
+          doc.text("TANGGAL TRANSAKSI", leftMargin, 60);
+          doc.text(": " + tanggal_transaksi, leftMargin + labelWidth, 60);
+
+          doc.text("NAMA KOST", leftMargin, 70);
+          doc.text(": " + nama_kost, leftMargin + labelWidth, 70);
+
+          doc.text("DURASI SEWA", leftMargin, 80);
+          doc.text(": " + durasi, leftMargin + labelWidth, 80);
+
+          doc.text("NOMINAL", leftMargin, 90);
+          doc.text(": Rp " + nominal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."), leftMargin + labelWidth, 90);
+
+          doc.text("WAKTU PEMBAYARAN", leftMargin, 100);
+          doc.text(": " + waktu_pembayaran, leftMargin + labelWidth, 100);
+
+          doc.text("STATUS", leftMargin, 110);
+          doc.text(": " + status, leftMargin + labelWidth, 110);
+
+
+          // Add additional styling if necessary
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(12);
+          doc.text("Terima Kasih telah menggunakan platform CAHKOST", pageWidth / 2, 130, { align: "center" });
+
+          // Save the PDF
+          doc.save("invoice_" + orderID + ".pdf");
+          // Show success message after PDF is downloaded
+          const successMessage = document.getElementById("pdfSuccessMessage");
+          successMessage.classList.remove("hidden");
+
+          // Hide the message after a few seconds
+          setTimeout(() => {
+              successMessage.classList.add("hidden");
+          }, 3000);
+        }
+      </script>
+    </div>
+  </body>
+</html>

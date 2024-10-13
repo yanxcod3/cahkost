@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-server-GJZUeQUdi30SdKe4Cw0cf00H"></script>
+    
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      /* Keyframes for the movement */
+      @keyframes moveLeftRight {
+        0% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(15px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      .animated-logo {
+        animation: moveLeftRight 3s ease-in-out infinite;
+        transition: transform 0.3s;
+      }
+
+      /* Hover effect to pause the animation and slightly enlarge the logo */
+      .animated-logo:hover {
+        animation-play-state: paused;
+        transform: scale(1.1);
+      }
+      
+      /* Ukuran standar untuk ikon */
+      .icon-size {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .slider-kualitas {
+        height: 200px; 
+        object-fit: cover;
+      }
+
+      .slider-promo, .slider-solusi {
+        height: 340px; 
+        object-fit: cover;
+      }
+
+      .testimoni {
+          display: none;
+          transform: translateY(20px); /* Menggeser modal dari bawah */
+          transition: transform 0.5s ease; /* Transisi untuk opacity dan transform lebih pelan */
+      }
+
+      .testimoni.active {
+          display: flex; /* Menggunakan flex untuk memusatkan modal */
+          transform: translateY(0); /* Mengembalikan posisi modal ke tengah */
+      }
+
+      /* Slide Content */
+      .slider-content {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+      }
+
+      #testimonial-slider {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+      }
+      
+      /* Single Testimonial */
+      #testimonial-slider .shrink-0 {
+        min-width: 33.33%; /* For larger screens, each slide takes 1/3 of the width */
+        transition: background-color 0.3s ease-in-out;
+      }
+
+      /* Media query untuk layar mobile */
+      @media (max-width: 768px) {
+        .slider-kualitas {
+          height: 135px; 
+          object-fit: cover;
+        }
+        .slider-promo, .slider-solusi {
+          height: 220px; 
+          object-fit: cover;
+        }
+        #testimonial-slider .shrink-0 {
+          min-width: 100%; /* For mobile screens, each slide takes the full width */
+        }
+        .icon-size {
+          width: 26px;
+          height: 26px;
+        }
+        
+        /* Kurangi padding agar sesuai dengan ukuran ikon */
+        .fixed > div {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased bg-gray-100">
+    <% if (alert == 'welcome') { %>
+      <script>
+        Swal.fire({
+            title: 'Selamat Datang, <%= user.user_name %>!',
+            text: 'Kami senang Anda di sini!',
+            imageUrl: '<%= user.user_profile %>',
+            imageWidth: 100,
+            imageHeight: 100,
+            imageAlt: 'Gambar Profil',
+            showCloseButton: true,
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            customClass: {
+                image: 'rounded-full object-cover'
+            }
+        });
+      </script>
+    <% } else if (alert == 'welcome') { %>
+      <script>
+        Swal.fire({
+            title: 'Selamat Datang, <%= user.user_name %>!',
+            text: 'Kami senang Anda di sini!',
+            imageUrl: '<%= user.user_profile %>',
+            imageWidth: 100,
+            imageHeight: 100,
+            imageAlt: 'Gambar Profil',
+            showCloseButton: true,
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            customClass: {
+                image: 'rounded-full object-cover'
+            }
+        });
+    </script>
+    <% } else if(token) { %>
+    <script type="text/javascript">
+        window.snap.pay('<%= token %>');
+    </script>
+    <% } %>
+    <!-- Header -->
+    <%- include('partials/header') %>
+
+    <%- include('partials/icon') %>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Hero Section -->
+      <section
+        class="relative bg-cover bg-center text-center text-white py-20 rounded-b-[50px] overflow-hidden"
+        style="position: relative; overflow: hidden"
+      >
+        <!-- Background image with border-radius -->
+        <div
+          class="absolute inset-0"
+          style="
+            background-image: url('/random-image');
+            background-size: cover;
+            background-position: center;
+            border-radius: 0px 0px 50px 50px;
+            z-index: 0;
+          "
+        ></div>
+
+        <!-- Content -->
+        <div class="relative z-10 container mx-auto px-4">
+          <h1 class="text-4xl md:text-5xl font-bold text-shadow">
+            Anggaplah Ini Sebagai<span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+            >
+              Rumah
+            </span>
+            Sendiri di Mana Pun Anda Pergi
+          </h1>
+          <p class="mt-4 text-2xl text-shadow">
+            raihlah kehangatan di mana pun anda berada. baik di kota yang ramai
+            maupun di hutan.
+          </p>
+        </div>
+      </section>
+      <!-- Informasi Kost Anda -->
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800 text-center">
+          kualitas kost
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            CahKost
+          </span>
+          yang terjamin nyaman
+        </h2>
+        <!-- slider section -->
+        <div class="slider mt-8 relative overflow-hidden">
+          <div
+            class="slides flex transition-transform duration-700 ease-in-out"
+            id="slider"
+          >
+          <% image.folder1.forEach(data => { %>
+            <div
+              class="slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-2 transform hover:scale-105 transition-transform duration-500 ease-in-out"
+            >
+              <img
+                src="/home/kualitas/<%= data %>"
+                alt="Slide"
+                class="w-full rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-500 ease-in-out slider-kualitas"
+              />
+            </div>
+          <% }); %>          
+          </div>
+        </div>
+      </section>
+
+      <% if(session.user_id) { %>
+        <section class="mt-16">
+          <h2 class="text-2xl font-bold text-gray-800">
+            Di mana Anda ingin tinggal di CahKost?
+          </h2>
+          <form id="search-form" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4" method="get" action="/search">
+            <!-- Lokasi -->
+            <div>
+              <label for="kost-location" class="block text-gray-600">Lokasi Kost</label>
+              <div class="relative mt-1">
+              <select id="kost-location" name="lokasi" class="w-full px-4 py-2 border rounded">
+                <option>Surabaya</option>
+              </select></div>
+            </div>
+            <!-- Tipe Kost -->
+            <div>
+              <label for="kost-type" class="block text-gray-600">Kelas Kost</label>
+              <div class="relative mt-1">
+              <select id="kost-type" name="kelas" class="w-full px-4 py-2 border rounded">
+                <option value="" hidden>Pilih Kelas Kost</option>
+                <option>Kost Pria</option>
+                <option>Kost Wanita</option>
+                <option>Kost Eksklusif</option>
+              </select></div>
+            </div>
+            <span id="select-error" class="text-red-500 text-sm hidden">Pilih lokasi dan kelas kost sebelum melanjutkan.</span>
+            <!-- Tombol Pencarian -->
+            <div class="md:col-span-2">
+              <button
+                type="submit"
+                class="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Cari Kost
+              </button>
+            </div>
+          </form>
+        </section>
+        <div id="testimoniModal" class="testimoni fixed inset-0 flex items-center justify-center z-50">
+          <div class="bg-white rounded-lg shadow-2xl p-6 w-96">
+              <h2 class="text-lg font-bold mb-4 text-center"> #<span id="orderID"></span><br>TRANSAKSI BERHASIL</h2>
+              <p class="text-sm mb-4">
+                  Terimakasih telah menggunakan platform CAHKOST, untuk selalu menjadi yang terbaik berikan feedback kamu disini.
+              </p>
+              <form id="testimoniForm" method="post" action="/submit-testimoni" class="mt-4 space-y-4" enctype="multipart/form-data">
+                  <div>
+                      <label class="block text-gray-600">Nama </label>
+                      <input id="nama" name="nama" type="text" class="w-full px-4 py-2 border rounded-lg" value="<%= user.user_name %>" readonly/>
+                  </div>
+                  <div>
+                    <label class="block text-gray-600">Testimoni</label>
+                    <textarea id="testimoni" name="testimoni" rows="3" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan testimoni mengenai platform CAHKOST" maxlength="150" required></textarea>
+                    <div class="flex justify-between">
+                      <span id="error-sewa" class="text-red-500 text-sm hidden">Testimoni belum diisi.</span>
+                      <span id="char-count" class="text-gray-600 text-sm text-right w-full">0/150</span>
+                    </div>
+                  </div>
+                  <div class="flex justify-end">
+                      <button type="button" id="closeModal" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Tutup</button>
+                      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ml-2">Kirim</button>
+                  </div>
+              </form>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Updates Section -->
+      <section class="mt-16">
+        <h2
+          class="text-2xl font-bold text-gray-800 text-center mt-8"
+          data-aos="fade-up"
+        >
+          Promo Terbaru dari
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            CahKost
+          </span>
+        </h2>
+        <p
+          class="text-gray-600 mt-2 text-center"
+          data-aos="fade-up"
+          data-aos-delay="100"
+        >
+          Manfaatkan promo terbaik dari CahKost! Dapatkan diskon spesial untuk
+          penyewaan kost dan nikmati kenyamanan dengan harga yang terjangkau.
+          Promo terbatas, jangan sampai terlewatkan!
+        </p>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Promo 1 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-400 to-purple-500"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/promo/<%= image.folder2[0] %>"
+                alt="Promo 1"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Diskon 20% untuk Kost Eksklusif
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Dapatkan diskon spesial 20% untuk kost eksklusif di pusat kota
+              dengan fasilitas lengkap! Kesempatan terbatas.
+            </p>
+          </div>
+
+          <!-- Promo 2 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-400 to-purple-500"
+            data-aos="fade-up"
+            data-aos-delay="300"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/promo/<%= image.folder2[1] %>"
+                alt="Promo 2"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Gratis Biaya Sewa Bulan Pertama
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Nikmati gratis biaya sewa bulan pertama untuk kost pilihan Anda di
+              CahKost. Promo ini berlaku untuk 10 pendaftar pertama!
+            </p>
+          </div>
+
+          <!-- Promo 3 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-400 to-purple-500"
+            data-aos="fade-up"
+            data-aos-delay="400"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/promo/<%= image.folder2[2] %>"
+                alt="Promo 3"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Diskon 50% untuk Pelajar dan Mahasiswa
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Khusus pelajar dan mahasiswa, dapatkan diskon hingga 50% untuk
+              kost pilihan Anda! Tunjukkan kartu pelajar atau mahasiswa saat
+              pendaftaran.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="mt-16">
+        <h2
+          class="text-2xl font-bold text-gray-800 text-center"
+          data-aos="fade-up"
+          data-aos-delay="700"
+        >
+          Temukan Solusi Sempurna untuk Setiap Kebutuhan Anda di
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            CahKost
+          </span>
+        </h2>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Feature 1 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-500 to-purple-600"
+            data-aos="fade-up"
+            data-aos-delay="800"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/solusi/<%= image.folder3[0] %>"
+                alt="Feature 1"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Kost Eksklusif di Pusat Kota
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Pilih kost eksklusif di pusat kota dengan fasilitas lengkap, akses
+              mudah ke tempat strategis, dan lingkungan nyaman. Cocok untuk
+              profesional dan mahasiswa.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-500 to-purple-600"
+            data-aos="fade-up"
+            data-aos-delay="900"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/solusi/<%= image.folder3[1] %>"
+                alt="Feature 2"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Kost Budget-Friendly
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Temukan kost dengan harga terjangkau tanpa mengorbankan
+              kenyamanan. Ideal untuk para pelajar yang mencari tempat tinggal
+              praktis dan hemat.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div
+            class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105 card hover:bg-gradient-to-r from-blue-500 to-purple-600"
+            data-aos="fade-up"
+            data-aos-delay="1000"
+          >
+            <div class="overflow-hidden">
+              <img
+                src="/home/solusi/<%= image.folder3[2] %>"
+                alt="Feature 3"
+                class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
+              />
+            </div>
+            <h3 class="mt-4 text-lg font-bold text-gray-800">
+              Kost Keluarga Nyaman
+            </h3>
+            <p class="mt-2 text-gray-600">
+              Nikmati kost yang nyaman untuk keluarga kecil dengan ruang luas
+              dan fasilitas lengkap. Lokasi aman, dekat sekolah, dan pusat
+              perbelanjaan.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Map Section -->
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800"
+          data-aos="fade-right"
+          data-aos-delay="1000">
+          Pencarian alamat untuk kost
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            CahKost
+          </span>
+        </h2>
+        <!-- New location iframe -->
+        <div class="mt-4"
+          data-aos="zoom-in-up"
+          data-aos-delay="1500">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d34295.990949995474!2d112.70612782875789!3d-7.328062531525581!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb67f8d1bc05%3A0xd7be60ef6890936e!2sKec.%20Gayungan%2C%20Surabaya%2C%20Jawa%20Timur!5e1!3m2!1sid!2sid!4v1727022760565!5m2!1sid!2sid"
+            width="100%"
+            height="450"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </section>
+
+      <!-- Partnership Section -->
+      <section class="mt-16 text-center"
+        data-aos="fade-up"
+        data-aos-delay="1700">
+        <h2 class="text-2xl font-bold text-gray-800">
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            Partnership
+          </span>
+        </h2>
+        <p class="mt-4 text-gray-600"
+          data-aos="fade-right"
+          data-aos-delay="1900">
+          Terimakasih Kepada Para Partnership Telah Bekerja Sama Dengan
+          CahKost!!!
+        </p>
+
+        <div class="mt-8 flex justify-center flex-wrap gap-8">
+          <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
+            data-aos="zoom-in-up"
+            data-aos-delay="2000">
+            <img
+              src="/assets/home/partnership/gojek.png"
+              alt="Gojek"
+              class="h-16 md:h-20 mx-auto animated-logo"
+            />
+          </a>
+
+          <a href="https://www.grab.com/id/" class="w-1/3 sm:w-1/4 md:w-1/6"
+            data-aos="zoom-in-up"
+            data-aos-delay="2200">
+            <img
+              src="/assets/home/partnership/Grab Official.jpeg"
+              alt="Grab"
+              class="h-16 md:h-20 mx-auto animated-logo"
+            />
+          </a>
+
+          <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
+            data-aos="zoom-in-up"
+            data-aos-delay="2300">
+            <img
+              src="/assets/home/partnership/unesa.png"
+              alt="Unesa"
+              class="h-16 md:h-20 mx-auto animated-logo"
+            />
+          </a>
+
+          <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
+            data-aos="zoom-in-up"
+            data-aos-delay="2500">
+            <img
+              src="/assets/home/partnership/Kota Surabaya 1.png"
+              alt="Surabaya"
+              class="h-16 md:h-20 mx-auto animated-logo"
+            />
+          </a>
+
+          <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
+            data-aos="zoom-in-up"
+            data-aos-delay="2700">
+            <img
+              src="/assets/home/partnership/bankmandiri.png"
+              alt="Bank Mandiri"
+              class="h-16 md:h-20 mx-auto animated-logo"
+            />
+          </a>
+        </div>
+      </section>
+
+      <!-- Testimonials Section -->
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800 text-left">
+          Testimoni dari pengguna
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
+          >
+            CahKost
+          </span>
+        </h2>
+        <p class="mt-4 text-gray-600 text-left">
+          Berikut adalah testimoni dari para penghuni yang pernah tinggal di
+          CahKost.
+        </p>
+
+        <div class="relative mt-8">
+          <!-- Slider Container -->
+          <div id="testimonial-slider" class="overflow-hidden">
+            <div class="slider-content flex transform transition-transform duration-500 ease-in-out">
+              <% testimoni.forEach(data => { %>
+              <div class="w-1/3 px-4 shrink-0">
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:bg-yellow-400 transition duration-300 ease-in-out">
+                  <img
+                    src="<%= data.testimoni_profile %>"
+                    alt="User 1"
+                    class="rounded-full w-16 h-16 mx-auto"
+                  />
+                  <p class="mt-4 text-gray-600">
+                    "<%= data.testimoni_feedback %>"
+                  </p>
+                  <p class="mt-2 text-gray-600 font-bold">- <%= data.testimoni_name %></p>
+                </div>
+              </div>
+              <% }) %> 
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <% if(!session.user_id) { %>
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800">
+          Pertanyaan yang Sering Diajukan
+        </h2>
+        <div class="mt-4" id="faq">
+          <details class="mb-4">
+            <summary class="font-bold text-gray-600">
+              Apakah harga sewa sudah termasuk biaya listrik dan air?
+            </summary>
+            <p class="mt-2 text-gray-600">
+              "Harga sewa bulanan yang kami tawarkan sudah termasuk biaya air,
+              namun biaya listrik akan dikenakan berdasarkan penggunaan
+              masing-masing kamar. Setiap kamar dilengkapi dengan meteran
+              listrik sendiri sehingga Anda dapat memantau penggunaan secara
+              mandiri."
+            </p>
+          </details>
+          <details class="mb-4">
+            <summary class="font-bold text-gray-600">
+              Apa saja fasilitas yang tersedia di kost ini?
+            </summary>
+            <p class="mt-2 text-gray-600">
+              "Fasilitas yang kami sediakan meliputi tempat tidur, lemari
+              pakaian, meja belajar, dan AC di setiap kamar. Selain itu, kami
+              juga memiliki akses Wi-Fi, dapur bersama, ruang tamu, serta area
+              parkir yang cukup luas untuk kendaraan pribadi."
+            </p>
+          </details>
+          <details class="mb-4">
+            <summary class="font-bold text-gray-600">
+              Apakah ada jam malam atau aturan khusus untuk penghuni?
+            </summary>
+            <p class="mt-2 text-gray-600">
+              "Kami tidak memberlakukan jam malam yang ketat, namun demi
+              kenyamanan bersama, kami mengharapkan penghuni untuk menjaga
+              ketenangan setelah pukul 10 malam. Selain itu, kami juga memiliki
+              aturan dasar seperti tidak merokok di dalam ruangan dan menjaga
+              kebersihan area bersama."
+            </p>
+          </details>
+          <details class="mb-4">
+            <summary class="font-bold text-gray-600">
+              Apakah ada uang jaminan atau deposit yang perlu dibayarkan?
+            </summary>
+            <p class="mt-2 text-gray-600">
+              "Ya, kami meminta uang deposit sebesar satu bulan sewa yang akan
+              dikembalikan saat Anda pindah, asalkan tidak ada kerusakan pada
+              properti dan seluruh tagihan telah dilunasi. Uang deposit ini
+              sebagai bentuk jaminan selama masa tinggal."
+            </p>
+          </details>
+          <details class="mb-4">
+            <summary class="font-bold text-gray-600">
+              Bagaimana prosedur pembayaran sewa kost?
+            </summary>
+            <p class="mt-2 text-gray-600">
+              "Pembayaran sewa dapat dilakukan secara bulanan melalui transfer
+              bank atau pembayaran tunai. Kami juga memberikan fleksibilitas
+              untuk pembayaran di awal bulan atau di akhir bulan, sesuai dengan
+              perjanjian yang telah disepakati."
+            </p>
+          </details>
+        </div>
+      </section>
+      <% } %>
+    </main>
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+  
+    <script>
+      // Function to hide the alert message
+      function hideError() {
+        document.getElementById('select-error').classList.add('hidden');
+      }
+    
+      // Form submission event listener
+      document.getElementById('search-form').addEventListener('submit', function(event) {
+        const locationSelect = document.getElementById('kost-location');
+        const typeSelect = document.getElementById('kost-type');
+    
+        // Initially hide the error message
+        hideError();
+    
+        // Check if selections are made
+        if (locationSelect.value === '' || typeSelect.value === '') {
+          event.preventDefault(); // Prevent form submission
+          document.getElementById('select-error').classList.remove('hidden'); // Show alert message
+        }
+      });
+    
+      // Add change event listeners to select elements
+      document.getElementById('kost-location').addEventListener('change', hideError);
+      document.getElementById('kost-type').addEventListener('change', hideError);
+    </script>    
+    <script>
+      const textarea = document.getElementById('testimoni');
+      const charCount = document.getElementById('char-count');
+    
+      textarea.addEventListener('input', function () {
+        const currentLength = textarea.value.length;
+        charCount.textContent = `${currentLength}/150`;
+      });
+    </script>
+    <script>
+      window.addEventListener('DOMContentLoaded', (event) => {
+        const modal = document.getElementById('testimoniModal');
+        const openModalButton = document.getElementById('openModal');
+        const closeModalButton = document.getElementById('closeModal');
+        const form = document.getElementById('testimoniForm');
+
+        // Fungsi untuk membuka modal
+        const openModal = () => {
+            modal.style.display = 'flex'; // Menampilkan modal
+            setTimeout(() => {
+                modal.classList.add('active'); // Menambahkan kelas aktif setelah ditampilkan
+            }, 10); // Memberikan sedikit delay untuk transisi
+        };
+
+        // Menutup modal
+        closeModalButton.addEventListener('click', () => {
+            modal.classList.remove('active');
+            // Delay untuk transisi sebelum menyembunyikan
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 500); // Waktu sama dengan durasi transisi
+            window.location.href= '/'
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id'); // Ambil order_id dari URL
+        const code = urlParams.get('status_code'); // Ambil order_id dari URL
+        const status = urlParams.get('transaction_status'); // Ambil order_id dari URL
+        document.getElementById('orderID').innerText = orderId;
+
+        // Memastikan orderId ada sebelum melakukan fetch
+        if (orderId && code === '200' && status === 'settlement') {
+          openModal()
+        }
+
+        // Menangani pengiriman form
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const data = {
+              orderID: orderId,
+              nama: document.getElementById('nama').value,
+              testimoni: document.getElementById('testimoni').value,
+            };
+            Swal.fire({
+              title: 'Terimakasih!',
+              text: 'Testimoni kamu berhasil dikirim.',
+              icon: 'success',
+              confirmButtonText: 'Oke'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Kirim form secara manual menggunakan fetch atau form submission
+                fetch('/submit-testimoni', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                form.reset()
+                window.location.href = '/';
+              }
+            });
+        });
+      });
+    </script>
+    <script>
+      //partnership logo
+      const logos = document.querySelectorAll(".animated-logo");
+      logos.forEach((logo) => {
+        logo.addEventListener("mouseenter", () => {
+          logo.style.animationPlayState = "paused";
+        });
+        logo.addEventListener("mouseleave", () => {
+          logo.style.animationPlayState = "running";
+        });
+      });
+    </script>
+    <script>
+      const sliderContainer = document.querySelector(".slides");
+      const slides = Array.from(sliderContainer.children);
+      let slideWidth = slides[0].offsetWidth;
+      let currentIndex = 0;
+      let slideInterval;
+  
+      // Clone all slides and append them to the end for continuous sliding
+      const originalSlideCount = slides.length;
+      for (let i = 0; i < originalSlideCount; i++) {
+          const clone = slides[i].cloneNode(true);
+          sliderContainer.appendChild(clone);
+      }
+  
+      // Handle window resize for responsive behavior
+      window.addEventListener("resize", () => {
+          slideWidth = slides[0].offsetWidth;
+          sliderContainer.style.transition = "none"; // No transition during resize
+          sliderContainer.style.transform = `translateX(-${currentIndex * slideWidth}px)`; // Reset transform during resize
+      });
+  
+      // Function to move to the next slide
+      function moveToNextSlide() {
+          currentIndex++;
+          const offsetX = currentIndex * slideWidth;
+  
+          // Check if reached the last clone (beyond the original slides)
+          if (currentIndex >= originalSlideCount) {
+              // Move to the last slide with transition
+              sliderContainer.style.transition = "transform 0.5s ease"; 
+              sliderContainer.style.transform = `translateX(-${offsetX}px)`; // Move to the next slide
+              
+              // After the transition ends, reset to the first slide
+              setTimeout(() => {
+                  currentIndex = 0; // Reset to first slide
+                  sliderContainer.style.transition = "none"; // No transition during reset
+                  sliderContainer.style.transform = `translateX(0px)`; // Reset transform
+              }, 500); // Match this duration with the slide transition duration
+          } else {
+              // Move to the next slide
+              sliderContainer.style.transition = "transform 0.5s ease"; 
+              sliderContainer.style.transform = `translateX(-${offsetX}px)`; // Move to the next slide
+          }
+      }
+  
+      // Function to start sliding
+      function startSliding() {
+          slideInterval = setInterval(moveToNextSlide, 3000); // Start automatic sliding every 3 seconds
+      }
+  
+      // Function to stop sliding
+      function stopSliding() {
+          clearInterval(slideInterval); // Stop the interval
+      }
+  
+      // Set initial position and start sliding
+      sliderContainer.style.transform = `translateX(0px)`;
+      startSliding();
+  
+      // Add event listeners for mouse enter and leave
+      sliderContainer.addEventListener("mouseenter", stopSliding); // Stop sliding on hover
+      sliderContainer.addEventListener("mouseleave", startSliding); // Resume sliding when not hovering
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const slider = document.getElementById("testimonial-slider");
+      const slides = slider.querySelector(".slider-content");
+      const totalSlides = slides.children.length;
+      let currentIndex = 0;
+      let intervalId;
+  
+      function getVisibleSlides() {
+        // Check the viewport width to determine the number of visible slides
+        return window.innerWidth <= 768 ? 1 : 3; // 1 slide for mobile, 3 for desktop
+      }
+  
+      function slide() {
+        const visibleSlides = getVisibleSlides();
+        currentIndex += 1;
+  
+        // Reset to first slide if we've gone past the total number of slides
+        if (currentIndex >= totalSlides - visibleSlides + 1) {
+          currentIndex = 0; // Reset to the start
+        }
+  
+        // Calculate the width of a single slide based on the slider's width
+        const slideWidth = slider.clientWidth / visibleSlides;
+  
+        // Move the slides
+        slides.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+      }
+  
+      function startSliding() {
+        intervalId = setInterval(slide, 5000); // Slide every 5 seconds
+      }
+  
+      function stopSliding() {
+        clearInterval(intervalId); // Stop sliding
+      }
+  
+      slider.addEventListener("mouseover", stopSliding); // Stop sliding on mouseover
+      slider.addEventListener("mouseout", startSliding); // Start sliding on mouseout
+  
+      // Initial sliding start
+      startSliding();
+  
+      // Adjust slider behavior on window resize
+      window.addEventListener("resize", function () {
+        // Update the transform based on the current index and new slide width
+        const visibleSlides = getVisibleSlides();
+        const slideWidth = slider.clientWidth / visibleSlides;
+        slides.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+      });
+    });
+  </script>  
+    <script>
+      document.querySelectorAll('#faq details').forEach((detail) => {
+        detail.addEventListener('toggle', function () {
+          if (this.open) {
+            document.querySelectorAll('#faq details').forEach((otherDetail) => {
+              if (otherDetail !== this) {
+                otherDetail.removeAttribute('open');
+              }
+            });
+          }
+        });
+      });
+    </script>
+  <script>
+    AOS.init({
+      once: false,
+      mirror: true,
+    });
+  </script>
+  </body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      
+      /* Ukuran standar untuk ikon */
+      .icon-size {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* Media query untuk layar mobile */
+      @media (max-width: 768px) {
+        .icon-size {
+          width: 26px;
+          height: 26px;
+        }
+        
+        /* Kurangi padding agar sesuai dengan ukuran ikon */
+        .fixed > div {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased bg-gray-100">
+    <!-- Header -->
+    <%- include('partials/header') %>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800">Tentang Kami</h2>
+        <p class="mt-4 text-gray-600">
+          Selamat datang di <strong>CahKost</strong>, solusi terbaik bagi mahasiswa baru <strong>Universitas Negeri Surabaya (UNESA)</strong> Ketintang, khususnya angkatan 2025 dan seterusnya, yang mencari tempat tinggal nyaman, aman, dan terjangkau di daerah <strong>Kecamatan Gayungan</strong>, <strong>Surabaya Selatan</strong>. Kami memahami bahwa masa kuliah adalah periode penuh tantangan, di mana mahasiswa harus menyeimbangkan antara studi, kehidupan sosial, dan kebutuhan harian. Oleh karena itu, CahKost hadir untuk memberikan Anda pengalaman tinggal yang menyenangkan dan bebas dari kerumitan, agar Anda bisa fokus pada hal yang paling penting—pendidikan Anda.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">1. Mengapa CahKost? Tempat Ideal untuk Mahasiswa UNESA</h3>
+        <p class="mt-4 text-gray-600">
+          Sebagai mahasiswa baru, Anda mungkin bertanya-tanya di mana tempat terbaik untuk tinggal yang dekat dengan kampus, hemat biaya, namun tetap nyaman dan modern. CahKost adalah jawabannya. Kami menawarkan <strong>berbagai jenis kost</strong> yang dapat disesuaikan dengan preferensi pribadi Anda, baik itu kost dengan kamar <strong>AC</strong> yang sejuk, <strong>kamar mandi</strong> dalam, atau yang menyediakan <strong>Wi-Fi berkecepatan tinggi</strong> untuk mendukung aktivitas belajar online atau hiburan.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Lokasi kami yang strategis di <strong>Kecamatan Gayungan</strong>, Surabaya Selatan, adalah salah satu keunggulan utama CahKost. Kost-kost kami terletak sangat dekat dengan <strong>kampus UNESA Ketintang</strong>, yang artinya Anda bisa menghemat banyak waktu perjalanan. Dengan perjalanan yang singkat, Anda bisa berjalan kaki atau menggunakan transportasi umum untuk mencapai kampus dalam hitungan menit. Hal ini memungkinkan Anda untuk memiliki lebih banyak waktu luang untuk belajar atau bersantai setelah hari yang panjang di kampus.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">2. Fasilitas Lengkap untuk Kehidupan Mahasiswa Modern</h3>
+        <p class="mt-4 text-gray-600">
+          Kami memahami bahwa kehidupan mahasiswa di era digital ini menuntut akses cepat dan nyaman ke teknologi. Oleh karena itu, semua unit CahKost dilengkapi dengan <strong>Wi-Fi berkecepatan tinggi</strong> yang memungkinkan Anda untuk mengakses informasi, belajar online, dan terhubung dengan teman-teman atau keluarga tanpa hambatan. Selain itu, setiap kamar kami dirancang untuk memberikan kenyamanan maksimal dengan <strong>kamar mandi dalam</strong>, <strong>AC</strong>, dan fasilitas lain seperti <strong>dapur bersama</strong>, <strong>laundry</strong>, dan <strong>area parkir</strong> yang luas. Kami ingin memastikan bahwa Anda merasa seperti di rumah sendiri, bahkan ketika jauh dari keluarga.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Kami juga menyediakan <strong>fasilitas keamanan 24 jam</strong>, termasuk <strong>CCTV</strong> dan petugas keamanan yang berjaga, sehingga Anda tidak perlu khawatir mengenai keselamatan Anda. Keselamatan adalah prioritas kami, dan kami berkomitmen untuk memberikan lingkungan yang aman bagi semua penghuni kami.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">3. Dekat dengan Pusat Aktivitas Mahasiswa dan Fasilitas Umum</h3>
+        <p class="mt-4 text-gray-600">
+          Salah satu kelebihan tinggal di CahKost adalah kemudahan akses ke berbagai fasilitas umum. <strong>Kecamatan Gayungan</strong> dikelilingi oleh <strong>pusat perbelanjaan</strong>, <strong>restoran</strong>, dan <strong>kafe</strong> yang cocok untuk mahasiswa yang ingin bersosialisasi atau sekadar mencari tempat belajar yang nyaman di luar kost. Jika Anda senang berolahraga, ada juga <strong>fasilitas olahraga</strong>, seperti gym dan taman kota, di sekitar kawasan ini.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Selain itu, jika Anda memerlukan akses mudah ke transportasi umum, <strong>terminal bus</strong> dan <strong>stasiun kereta</strong> juga terletak tidak jauh dari CahKost. Ini membuatnya sangat praktis bagi mahasiswa yang mungkin perlu bepergian ke luar kota atau menjelajahi area Surabaya untuk kegiatan akademik dan non-akademik. Lokasi strategis ini tidak hanya memberikan kenyamanan, tetapi juga memperkaya pengalaman hidup Anda di Surabaya.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">4. CahKost untuk Gaya Hidup Mahasiswa yang Seimbang</h3>
+        <p class="mt-4 text-gray-600">
+          Kami percaya bahwa gaya hidup yang seimbang adalah kunci keberhasilan akademik dan kehidupan yang lebih sehat. Tinggal di CahKost bukan hanya soal tempat tidur yang nyaman, tetapi juga tentang gaya hidup yang mendukung produktivitas dan relaksasi. Dengan suasana yang tenang dan dukungan dari sesama penghuni yang juga mahasiswa, Anda akan merasa seperti berada dalam <strong>komunitas mahasiswa</strong> yang hangat dan suportif.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Setiap mahasiswa memiliki kebutuhan yang berbeda, oleh karena itu kami menyediakan <strong>pilihan kamar yang bervariasi</strong>. Apakah Anda membutuhkan privasi ekstra untuk belajar atau lebih suka suasana yang ramai dengan teman sekamar, CahKost menawarkan solusi yang sesuai dengan preferensi Anda.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">5. Pilihan yang Terjangkau dengan Kualitas Terbaik</h3>
+        <p class="mt-4 text-gray-600">
+          Kami mengerti bahwa biaya menjadi salah satu pertimbangan utama bagi mahasiswa. CahKost hadir dengan <strong>harga yang sangat kompetitif</strong>, tanpa mengorbankan kualitas. Kami percaya bahwa setiap mahasiswa berhak mendapatkan tempat tinggal yang nyaman tanpa harus khawatir soal biaya. Dengan demikian, kami menawarkan berbagai <strong>paket sewa</strong> yang dapat disesuaikan dengan anggaran Anda, mulai dari sewa bulanan hingga tahunan, dengan fleksibilitas pembayaran yang memudahkan.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Kami juga sering menawarkan <strong>promo-promo menarik</strong> bagi mahasiswa baru, terutama untuk angkatan 2025 dan seterusnya, dengan diskon khusus untuk pembayaran di muka atau sewa jangka panjang. Ini merupakan kesempatan emas bagi Anda yang ingin mendapatkan tempat tinggal berkualitas dengan harga terjangkau.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">6. Bergabunglah dengan Keluarga CahKost</h3>
+        <p class="mt-4 text-gray-600">
+          Kami tidak hanya menyediakan tempat tinggal; kami membangun <strong>komunitas mahasiswa</strong> yang kuat dan saling mendukung. CahKost adalah rumah kedua Anda selama menempuh pendidikan di UNESA. Kami berkomitmen untuk menciptakan suasana yang nyaman, aman, dan menyenangkan, sehingga Anda dapat fokus pada pencapaian akademik dan pribadi Anda.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Kami juga menyediakan <strong>layanan pelanggan 24/7</strong> yang selalu siap membantu Anda, baik itu dalam hal perbaikan fasilitas, pertanyaan seputar kost, atau bantuan lain yang Anda butuhkan selama tinggal di sini. Tim kami yang profesional dan ramah akan memastikan bahwa setiap kebutuhan Anda terpenuhi dengan baik.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">7. Siap untuk Mahasiswa Baru 2025 dan Seterusnya</h3>
+        <p class="mt-4 text-gray-600">
+          Bagi Anda, mahasiswa baru angkatan 2025 dan seterusnya, CahKost memberikan kesempatan untuk memulai perjalanan akademik Anda dengan cara yang paling nyaman dan efisien. Kami mengundang Anda untuk merasakan sendiri bagaimana tinggal di kost yang didesain khusus untuk mahasiswa dapat membuat hidup lebih mudah dan produktif. Apakah Anda sedang mencari tempat tinggal jangka panjang atau hanya untuk beberapa semester, CahKost adalah pilihan yang tepat.
+        </p>
+        <p class="mt-4 text-gray-600">
+          Jangan ragu untuk menghubungi kami dan melakukan tur ke salah satu unit kami. Kami dengan senang hati akan membantu Anda menemukan tempat tinggal yang sesuai dengan kebutuhan dan anggaran Anda.
+        </p>
+        
+        <p class="mt-8 text-gray-600">
+          <strong>CahKost</strong> adalah lebih dari sekadar tempat tinggal. Ini adalah rumah bagi mahasiswa baru yang ingin mendapatkan pengalaman terbaik selama masa studi di UNESA. Dengan segala fasilitas dan layanan kami, kami siap menyambut angkatan 2025 dan seterusnya dengan tangan terbuka. Temukan kenyamanan, keamanan, dan komunitas di <strong>CahKost</strong>, dan jadikan masa kuliah Anda di UNESA lebih berkesan.
+        </p>
+        
+        <h3 class="mt-8 text-xl font-bold text-gray-800">Kesimpulan</h3>
+        <p class="mt-4 text-gray-600">
+          Kami di CahKost percaya bahwa tempat tinggal yang baik adalah pondasi dari kehidupan akademik yang sukses. Bergabunglah dengan CahKost dan temukan bagaimana kami dapat membantu Anda mewujudkan masa kuliah yang nyaman dan tanpa stres. Kami menantikan untuk menjadi bagian dari perjalanan akademik Anda di UNESA Ketintang.
+        </p>
+      </section>
+    </main>
+    
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+
+  </body>
+</html>

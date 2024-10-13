@@ -1,0 +1,735 @@
+<style>
+    #imagePreviewContainer {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* Three columns */
+        justify-items: center; /* Center items horizontally */
+    }
+
+    #imagePreviewContainer > div {
+        grid-column: span 1; /* Each image spans one column */
+        width: 100%; /* Set to full width of the column */
+        max-width: 80px; /* Limit the maximum width */
+        height: 100%; /* Allow height to adjust based on content */
+    }
+
+    #imagePreviewContainer > div:first-child {
+        grid-column: span 3; /* First image spans all columns */
+        width: 100%; /* Set to full width of the column */
+        max-width: 80px; /* Limit the maximum width */
+        height: 100%; /* Allow height to adjust based on content */
+    }
+
+    #imagePreviewContainer > div:nth-child(n+2) {
+        grid-column: span 1; /* Subsequent images span one column */
+        width: 100%; /* Set to full width of the column */
+        max-width: 80px; /* Limit the maximum width */
+        height: 100%; /* Allow height to adjust based on content */
+    }
+</style>
+<body class="font-sans antialiased bg-gray-100">
+    <% if(session.user_id) { %>
+        <div class="fixed bottom-5 right-5 flex flex-col space-y-5 z-50">
+            <% if(user.user_premium == 'yes') { %>
+            <div
+              class="bg-purple-600 hover:bg-blue-600 cursor-pointer p-4 rounded-full shadow-lg transition-colors"
+              onclick="openModalForm()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-9 w-9 text-white icon-size"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 12l9-9 9 9M9 21V9h6v12"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 9v6m-3-3h6"
+                />
+              </svg>
+            </div>
+            <% } %>
+    
+          <div
+            id="chatIcon"
+            class="bg-purple-600 hover:bg-blue-600 cursor-pointer p-4 rounded-full shadow-lg transition-colors"
+            onclick="toggleChatPanel()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-9 w-9 text-white icon-size"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M21 16.2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2h14l4 4V16.2z"
+              />
+            </svg>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Modal Product Form -->
+        <div
+        id="formModal"
+        class="fixed inset-0 hidden flex items-center justify-center z-50 overflow-y-auto"
+    >
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative mt-4 overflow-auto max-h-screen">
+            <h2 class="text-2xl font-bold mb-4">Form Produk</h2>
+    
+            <!-- Close Icon -->
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeModalForm()">
+                ✖
+            </button>
+            
+            <!-- Product Form -->
+            <form id="productForm" class="mt-4 space-y-4" enctype="multipart/form-data" onsubmit="return validateForm();">
+                <div class="flex justify-between space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Nama Kost</label>
+                        <input type="text" id="nameKost" name="nameKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan nama kost" />
+                        <span class="text-red-600 text-sm hidden" id="nameKostAlert">Nama Kost harus diisi.</span>
+                    </div>
+                
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Kelas Kost</label>
+                        <select id="typeKost" name="typeKost" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="" hidden>Pilih Kelas Kost</option>
+                            <option value="KOST PRIA">Kost Pria</option>
+                            <option value="KOST WANITA">Kost Wanita</option>
+                            <option value="KOST EKSKLUSIF">Kost Eksklusif</option>
+                        </select>
+                        <span class="text-red-600 text-sm hidden" id="typeKostAlert">Kelas Kost harus dipilih.</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600">Alamat Kost</label>
+                    <input type="text" id="alamatKost" name="alamatKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan alamat lengkap kost" />
+                    <span class="text-red-600 text-sm hidden" id="alamatKostAlert">Alamat Kost harus diisi.</span>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-600">Deskripsi Kost</label>
+                    <textarea id="deskripsiKost" name="deskripsiKost" class="w-full px-4 py-2 border rounded-lg" rows="2" placeholder="Masukkan deskripsi kost dan sertakan aturan kost yang berlaku"></textarea>
+                    <span class="text-red-600 text-sm hidden" id="deskripsiKostAlert">Deskripsi Kost harus diisi.</span>
+                </div>
+                
+                <div class="flex justify-between space-x-4">
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Harga Kost</label>
+                        <input type="text" id="priceKost" name="priceKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan harga kost" oninput="formatCurrency(this); updatePromoPrice()" />
+                        <span class="text-red-600 text-sm hidden" id="priceKostAlert">Harga Kost harus diisi.</span>
+                    </div>
+                
+                    <div class="w-1/2">
+                        <label class="block text-gray-600">Promo (%)</label>
+                        <input type="number" id="promoKost" name="promoKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan promo" oninput="updatePromoPrice(); this.value = this.value.slice(0, 3)" min="5" max="100"/>
+                        <span class="text-red-600 text-sm hidden" id="promoKostAlert">Masukkan promo jika ada, jika tidak abaikan.</span>
+                    </div>
+                </div>
+                
+                <!-- Add the promotional price input field -->
+                <div id="promoPriceContainer" class="hidden">
+                    <label class="block text-gray-600">Harga Promo</label>
+                    <input type="text" id="promoPriceKost" name="promoPriceKost" class="w-full px-4 py-2 border rounded-lg font-bold" placeholder="Masukkan harga promo" readonly />
+                </div>
+                
+                <span id="promoAlert" class="text-green-500 text-sm hidden">Abaikan kolom promo bila tidak ingin memasang harga promo.</span> 
+                
+                <div class="flex-1">
+                    <label class="block text-gray-600">Detail Kost</label>
+                    <select id="infoKost" name="infoKost" class="w-full px-4 py-2 border rounded-lg" onchange="toggleFacilities()">
+                        <option value="fasilitasK">Fasilitas Kamar</option>
+                        <option value="fasilitasB">Fasilitas Bersama</option>
+                    </select>
+                
+                    <!-- Fasilitas Kamar Section -->
+                    <div id="fasilitasKamar">
+                        <label class="block text-gray-600 mt-4">Fasilitas Kamar</label>
+                        <div class="flex flex-wrap">
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="listrik" name="fasilitasKamar[]" value="listrik" class="mr-2" />
+                                <label for="listrik">Listrik</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kMandiDalam" name="fasilitasKamar[]" value="kMandiDalam" class="mr-2" />
+                                <label for="kMandiDalam">K. Mandi Dalam</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="wifi" name="fasilitasKamar[]" value="wifi" class="mr-2" />
+                                <label for="wifi">WiFi</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="ac" name="fasilitasKamar[]" value="ac" class="mr-2" />
+                                <label for="ac">AC</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kasur" name="fasilitasKamar[]" value="kasur" class="mr-2" />
+                                <label for="kasur">Kasur</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="jendela" name="fasilitasKamar[]" value="jendela" class="mr-2" />
+                                <label for="jendela">Jendela</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="tvKamar" name="fasilitasKamar[]" value="tv" class="mr-2" />
+                                <label for="tvKamar">TV</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kursi" name="fasilitasKamar[]" value="kursi" class="mr-2" />
+                                <label for="kursi">Kursi</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kipasAngin" name="fasilitasKamar[]" value="kipasAngin" class="mr-2" />
+                                <label for="kipasAngin">Kipas Angin</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="meja" name="fasilitasKamar[]" value="meja" class="mr-2" />
+                                <label for="meja">Meja</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="lemariBaju" name="fasilitasKamar[]" value="lemariBaju" class="mr-2" />
+                                <label for="lemariBaju">Lemari Baju</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="klosetDuduk" name="fasilitasKamar[]" value="klosetDuduk" class="mr-2" />
+                                <label for="klosetDuduk">Kloset Duduk</label>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Fasilitas Bersama Section -->
+                    <div id="fasilitasBersama" class="hidden">
+                        <label class="block text-gray-600 mt-4">Fasilitas Bersama</label>
+                        <div class="flex flex-wrap">
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="penjagaKos" name="fasilitasBersama[]" value="penjagaKos" class="mr-2" />
+                                <label for="penjagaKos">Penjaga Kos</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="dispenser" name="fasilitasBersama[]" value="dispenser" class="mr-2" />
+                                <label for="dispenser">Dispenser</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="laundry" name="fasilitasBersama[]" value="laundry" class="mr-2" />
+                                <label for="laundry">Laundry</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="kulkas" name="fasilitasBersama[]" value="kulkas" class="mr-2" />
+                                <label for="kulkas">Kulkas</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="tvBersama" name="fasilitasBersama[]" value="tv" class="mr-2" />
+                                <label for="tvBersama">TV</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="dapur" name="fasilitasBersama[]" value="dapur" class="mr-2" />
+                                <label for="dapur">Dapur</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="rKeluarga" name="fasilitasBersama[]" value="rKeluarga" class="mr-2" />
+                                <label for="rKeluarga">R. Keluarga</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="mushola" name="fasilitasBersama[]" value="mushola" class="mr-2" />
+                                <label for="mushola">Mushola</label>
+                            </div>
+                            <div class="flex items-center w-1/3">
+                                <input type="checkbox" id="mesinCuci" name="fasilitasBersama[]" value="mesinCuci" class="mr-2" />
+                                <label for="mesinCuci">Mesin Cuci</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg">
+                    Unggah Gambar
+                </button>
+            </form>
+        </div>
+    </div>
+    
+        <!-- Modal Premium -->
+        <div
+        id="productModal"
+        class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+        >
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative mt-4">
+            <h2 class="text-2xl font-bold mb-2">Gambar Produk</h2>
+            <p class="mb-2">
+                Unggah gambar fasilitas kostmu, termasuk kamar tidur, kamar mandi, dapur, dll.
+            </p>
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeModalProduct()">
+                ✖
+            </button>
+            
+            <!-- Form Upload Gambar -->
+            <p class="text-sm text-gray-600 text-center mb-2">maksimal 10 gambar</p>
+            <form id="photoUploadForm" class="space-y-4" enctype="multipart/form-data" onsubmit="return handleFormSubmit(event);">
+            <div id="imagePreviewContainer" class="grid grid-cols-3 gap-4 mb-4">
+                <!-- Preview images will appear here -->
+            </div>
+
+            <input
+                type="file"
+                id="images"
+                name="imageInput"
+                accept="image/*"
+                class="hidden"
+                onchange="handleImageUpload(this)"
+                multiple
+            />
+
+            <label for="images" class="flex items-center justify-center bg-blue-500 text-white rounded cursor-pointer block mx-auto w-14 h-14">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+            </label>
+
+            <button id="resetButton" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hidden" onclick="resetImages()">Reset Gambar</button>
+            <p id="uploadAlert" class="text-red-600 hidden">Anda melebihi batas jumlah maksimal gambar.</p>
+            <p id="minAlert" class="text-red-600 hidden">Unggah minimal 5 gambar untuk melanjutkan.</p>
+
+            <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg">
+                Submit
+            </button>
+        </form>
+        </div>
+        </div>
+    
+        <!-- live chat -->
+        <div
+          id="chatPanel"
+          class="fixed top-0 right-0 h-full w-0 bg-white shadow-lg transition-all duration-300 overflow-hidden"
+        >
+          <div class="p-6">
+            <h2 class="text-2xl font-bold mb-4">CahKost: Pertanyaan Umum</h2>
+    
+            <!-- Pilihan Pertanyaan -->
+            <select id="questionSelect" class="border p-2 rounded w-full mb-4">
+              <option value="" hidden>-- Pilih Pertanyaan --</option>
+              <option value="harga">Berapa harga sewa per bulan di CahKost?</option>
+              <option value="fasilitas">Apa saja fasilitas yang tersedia di CahKost?</option>
+              <option value="lokasi">Di mana lokasi CahKost?</option>
+              <option value="kontak">Bagaimana cara menghubungi CahKost?</option>
+              <option value="kebijakan_tamu">Apakah ada kebijakan terkait tamu yang berkunjung?</option>
+              <option value="pembayaran">Metode pembayaran apa saja yang diterima di CahKost?</option>
+              <option value="kebijakan_refund">Bagaimana kebijakan refund jika saya membatalkan sewa?</option>
+              <option value="aturan">Apakah ada aturan kost yang perlu diketahui penyewa?</option>
+            </select>
+    
+            <!-- Area untuk menampilkan jawaban -->
+            <div id="responseArea" class="mb-4"></div>
+    
+            <button
+              class="bg-red-500 text-white px-4 py-2 rounded"
+              onclick="toggleChatPanel()"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+        <script>
+            // live chat
+            function toggleChatPanel() {
+                const chatPanel = document.getElementById("chatPanel");
+                const chatIcon = document.getElementById("chatIcon");
+        
+                if (chatPanel.style.width === "300px") {
+                    chatPanel.style.width = "0";
+                    chatPanel.style.zIndex = "50";
+                    chatIcon.style.display = "block";
+                } else {
+                    chatPanel.style.width = "300px";
+                    chatPanel.style.zIndex = "100";
+                    chatIcon.style.display = "none";
+        
+                    // Reset pilihan pertanyaan dan area respons ketika chat dibuka
+                    document.getElementById("questionSelect").value = "";
+                    document.getElementById("responseArea").innerHTML = "";
+                }
+            }
+        
+            document.getElementById("questionSelect").addEventListener("change", function () {
+                const selectedQuestion = this.value;
+                showResponse(selectedQuestion);
+            });
+        
+            function showResponse(selectedQuestion) {
+                const responseArea = document.getElementById("responseArea");
+                let response = "";
+        
+                switch (selectedQuestion) {
+                    case "harga":
+                        response =
+                            "<p>Harga sewa di CahKost berkisar antara Rp 500.000 hingga Rp 5.000.000 per bulan, tergantung tipe kamar dan fasilitas yang Anda pilih.</p>";
+                        break;
+                    case "fasilitas":
+                        response =
+                            "<p>CahKost menyediakan fasilitas seperti Wi-Fi berkecepatan tinggi, AC, kamar mandi dalam, dapur bersama, laundry, dan keamanan 24 jam.</p>";
+                        break;
+                    case "lokasi":
+                        response =
+                            "<p>Kantor CahKost terletak di Kecamatan Gayungan, Surabaya Selatan.</p>";
+                        break;
+                    case "kontak":
+                        response =
+                            "<p>Anda dapat menghubungi CahKost melalui telepon di 0851-5844-2747 atau email di unesacahkost@gmail.com</p>";
+                        break;
+                    case "kebijakan_tamu":
+                        response =
+                            "<p>Tamu diperbolehkan berkunjung hingga pukul 22.00 WIB. Namun, tamu tidak diperkenankan menginap kecuali ada izin khusus dari pengelola.</p>";
+                        break;
+                    case "pembayaran":
+                        response =
+                            "<p>Kami menerima pembayaran melalui transfer bank, dan dompet digital seperti OVO, Gopay, Dana dan Qris. Pembayaran bulanan dilakukan sebelum tanggal 5 setiap bulannya.</p>";
+                        break;
+                    case "kebijakan_refund":
+                        response =
+                            "<p>Jika Anda membatalkan sewa sebelum masa kontrak habis, biaya sewa bulan berjalan tidak dapat dikembalikan. Namun, Anda dapat mendapatkan pengembalian sebagian dari deposit tergantung pada kondisi kamar saat diserahterimakan.</p>";
+                        break;
+                    case "aturan":
+                        response =
+                            "<p>Beberapa aturan umum di CahKost antara lain: Dilarang membawa hewan peliharaan dan dilarang membuat keributan yang mengganggu penghuni lain.</p>";
+                        break;
+                    default:
+                        response =
+                            "<p>Silakan pilih pertanyaan di atas untuk mendapatkan informasi lebih lanjut.</p>";
+                }
+        
+                responseArea.innerHTML = "<p>Sedang mengetik ....</p>";
+                setTimeout(() => {
+                    responseArea.innerHTML = response;
+                }, 6000); // Delay 6 detik
+            }
+        </script>  
+        <script>
+            function openModalForm() {
+                document.getElementById("formModal").classList.remove("hidden");
+                document.getElementById('productForm').reset();
+                document.querySelectorAll('.text-red-600').forEach(span => span.classList.add('hidden'));
+            }
+            function closeModalForm() {
+                document.getElementById("formModal").classList.add("hidden");
+            }
+            function openModalProduct() {
+                document.getElementById('images').value = ''; // Reset the file input
+                document.getElementById('imagePreviewContainer').innerHTML = ''; // Clear the image preview container
+                images = []; // Reset the uploaded images array
+                counter = 1;
+            
+                document.querySelector('label[for="images"]').classList.remove('hidden');
+                document.getElementById("productModal").classList.remove("hidden");
+            }
+        
+            function closeModalProduct() {
+                document.getElementById("productModal").classList.add("hidden");
+                document.getElementById('uploadAlert').classList.add('hidden');
+                document.getElementById('minAlert').classList.add('hidden');
+            }
+        </script>      
+        <script>
+            function validateForm() {
+                document.querySelectorAll('.text-red-600').forEach(alert => alert.classList.add('hidden'));
+
+                let isValid = true;
+            
+                // Check Nama Kost
+                const nameKost = document.getElementById('nameKost').value;
+                if (!nameKost) {
+                    document.getElementById('nameKostAlert').classList.remove('hidden');
+                    isValid = false;
+                }
+            
+                // Check Kelas Kost
+                const typeKost = document.getElementById('typeKost').value;
+                if (!typeKost) {
+                    document.getElementById('typeKostAlert').classList.remove('hidden');
+                    isValid = false;
+                }
+            
+                // Check Alamat Kost
+                const alamatKost = document.getElementById('alamatKost').value;
+                if (!alamatKost) {
+                    document.getElementById('alamatKostAlert').classList.remove('hidden');
+                    isValid = false;
+                }
+            
+                // Check Deskripsi Kost
+                const deskripsiKost = document.getElementById('deskripsiKost').value;
+                if (!deskripsiKost) {
+                    document.getElementById('deskripsiKostAlert').classList.remove('hidden');
+                    isValid = false;
+                }
+            
+                // Check Harga Kost
+                const priceKost = document.getElementById('priceKost').value;
+                if (!priceKost) {
+                    document.getElementById('priceKostAlert').classList.remove('hidden');
+                    isValid = false;
+                }
+            
+                // If valid, open the next modal and reset the form
+                if (isValid) {
+                    openModalProduct();
+                    return false; // Prevent form submission
+                }
+            
+                return isValid; // Return false to prevent form submission if not valid
+            }
+        </script> 
+        <script>
+            let images = [];
+            let counter = 1;
+        
+            function handleImageUpload(input) {
+                const files = input.files;
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                const uploadAlert = document.getElementById('uploadAlert');
+                const minAlert = document.getElementById('minAlert');
+        
+                // Reset alerts
+                uploadAlert.classList.add('hidden');
+        
+                // Check if the total number of images after upload exceeds 10
+                if (images.length + files.length > 10) {
+                    minAlert.classList.add('hidden');
+                    return uploadAlert.classList.remove('hidden');
+                } else {
+                    uploadAlert.classList.add('hidden');
+                    minAlert.classList.add('hidden');
+                }
+        
+                Array.from(files).forEach((file) => {
+                    const reader = new FileReader();
+        
+                    // Create a unique file name using timestamp and original file name
+                    const uniqueFileName = `${counter++}_${file.name}`;
+        
+                    reader.onload = function (e) {
+                        const imageData = { name: uniqueFileName, data: e.target.result };
+                        images.push(imageData); // Store the image data with unique file name
+        
+                        const img = new Image();
+                        img.src = e.target.result;
+        
+                        img.onload = function () {
+                            // Create a canvas to crop the image
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+        
+                            const size = Math.min(img.width, img.height); // Use the smaller dimension
+                            canvas.width = size;
+                            canvas.height = size;
+        
+                            // Draw the image on the canvas, cropping to a 1:1 aspect ratio
+                            ctx.drawImage(img, (img.width - size) / 2, (img.height - size) / 2, size, size, 0, 0, size, size);
+        
+                            // Convert canvas to a data URL
+                            const croppedImageUrl = canvas.toDataURL('image/jpeg');
+        
+                            // Create a new image preview element
+                            const previewElement = document.createElement('div');
+                            previewElement.classList.add('relative', 'border', 'border-gray-300', 'rounded', 'w-full', 'h-24', 'aspect-w-1', 'aspect-h-1'); // Aspect ratio 1:1
+        
+                            const imageElement = document.createElement('img');
+                            imageElement.src = croppedImageUrl;
+                            imageElement.classList.add('w-full', 'h-full', 'object-cover', 'rounded');
+        
+                            // Append the image to the preview element
+                            previewElement.appendChild(imageElement);
+                            imagePreviewContainer.appendChild(previewElement);
+        
+                            // Check if the total number of images exceeds 5 and hide the button
+                            if (images.length == images.length) {
+                                document.querySelector('label[for="images"]').classList.add('hidden');
+                                resetButton.classList.remove('hidden'); // Show the reset button
+                            } else {
+                                console.log("Current image count:", images.length); // Debugging line
+                            }
+                        };
+                    };
+        
+                    reader.readAsDataURL(file);
+                });
+            }
+            function resetImages() {
+                images = []; // Clear the images array
+                counter = 1; // Reset counter
+
+                // Clear the preview container
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                imagePreviewContainer.innerHTML = '';
+
+                // Show the upload button and hide the reset button
+                document.querySelector('label[for="images"]').classList.remove('hidden');
+                document.getElementById('resetButton').classList.add('hidden');
+
+                // Optionally, clear file input
+                document.getElementById('images').value = ''; 
+            }
+        </script>              
+        <script>
+            function validateImageUpload() {
+                if (images.length < 5) {
+                    document.getElementById('minAlert').classList.remove('hidden');
+                    return false; // Prevent form submission
+                }
+                return true; // Allow form submission
+            }
+
+            async function handleFormSubmit(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                if (!validateImageUpload()) {
+                    return; // Stop if validation fails
+                }
+
+                const formData = new FormData(event.target);
+
+                const fasilitasKamar = [];
+                const fasilitasBersama = [];
+                
+                const nameKost = document.getElementById('nameKost').value;
+                const typeKost = document.getElementById('typeKost').value;
+                const alamatKost = document.getElementById('alamatKost').value;
+                const deskripsiKost = document.getElementById('deskripsiKost').value;
+                const priceKost = document.getElementById('priceKost').value;
+                const promoKost = document.getElementById('promoKost').value;
+                const promoPriceKost = document.getElementById('promoPriceKost').value;
+                const fasilitasKCheckboxes = document.getElementsByName('fasilitasKamar[]');
+                const fasilitasBCheckboxes = document.getElementsByName('fasilitasBersama[]');
+                
+                fasilitasKCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        fasilitasKamar.push(checkbox.value);
+                    }
+                });
+
+                fasilitasBCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        fasilitasBersama.push(checkbox.value);
+                    }
+                });
+
+                formData.append(`nameKost`, nameKost)
+                formData.append(`typeKost`, typeKost)
+                formData.append(`alamatKost`, alamatKost)
+                formData.append(`deskripsiKost`, deskripsiKost)
+                formData.append(`priceKost`, priceKost)
+                formData.append(`promoKost`, promoKost)
+                formData.append(`promoPriceKost`, promoPriceKost)
+                formData.append(`fasilitasKamar`, fasilitasKamar)
+                formData.append(`fasilitasBersama`, fasilitasBersama)
+
+                try {
+                    fetch('/submit-product', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    document.getElementById("productModal").classList.add("hidden");
+                    document.getElementById("formModal").classList.add("hidden");
+
+                    Swal.fire({
+                        title: 'Produk Berhasil Ditambahkan',
+                        icon: 'success',
+                        confirmButtonText: 'Oke'
+                    })
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat mengunggah. Silakan coba lagi.');
+                }
+            }
+        </script>
+        <script>
+            function formatCurrency(input) {
+                // Remove all non-numeric characters, except for an optional decimal point
+                let value = input.value.replace(/[^0-9]/g, '');
+                let numberValue = parseInt(value, 10);
+
+                if (!isNaN(numberValue)) {
+                // Format the number with comma separators and add "Rp" prefix
+                    input.value = 'Rp ' + numberValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                } else {
+                    input.value = ''; // Clear the input if not a number
+                }
+            }
+            function updatePromoPrice() {
+                const priceKost = parseFloat(document.getElementById('priceKost').value.replace(/[^0-9]/g, '')) || 0; // Get the cost price
+                let promoKost = parseFloat(document.getElementById('promoKost').value) || 0; // Get the promo amount
+
+                if (promoKost > 100) {
+                    promoKost = 100
+                    document.getElementById('promoKost').value = 100; // Set value to 100 if exceeded
+                } else if (isNaN(promoKost) || promoKost < 0) {
+                    document.getElementById('promoKost').value = ''; // Clear the input if the value is not a valid number or negative
+                }
+
+                const discountAmount = (priceKost * promoKost) / 100; // Calculate the discount amount based on the percentage
+                const finalPrice = priceKost - discountAmount; // Calculate the final price after discount
+
+                // Update the "Harga Setelah Promo" field
+                document.getElementById('promoPriceKost').value = "Rp " + finalPrice.toLocaleString('id-ID'); // Ensure it doesn't go below 0
+            }
+            // Function to check promo fields and update UI
+            function checkPromoFields() {
+                const priceKost = document.getElementById("priceKost").value;
+                const promoKost = document.getElementById("promoKost").value;
+                const promoPriceContainer = document.getElementById("promoPriceContainer");
+                const promoAlert = document.getElementById("promoAlert");
+
+                // Show promotional price field if both price and promo are filled
+                if (priceKost && promoKost) {
+                    promoPriceContainer.classList.remove("hidden");
+                    promoAlert.classList.add("hidden"); // Hide alert
+                } else {
+                    promoPriceContainer.classList.add("hidden");
+                    promoAlert.classList.remove("hidden"); // Show alert if promo field is not filled
+                }
+            }
+
+            // Attach event listeners to input fields to check on input
+            document.getElementById("priceKost").addEventListener("input", checkPromoFields);
+            document.getElementById("promoKost").addEventListener("input", checkPromoFields);
+        </script>   
+        <script>
+            function toggleFacilities() {
+                const selectedValue = document.getElementById('infoKost').value;
+                const fasilitasKamar = document.getElementById('fasilitasKamar');
+                const fasilitasBersama = document.getElementById('fasilitasBersama');
+        
+                if (selectedValue === 'fasilitasK') {
+                    fasilitasKamar.classList.remove('hidden');
+                    fasilitasBersama.classList.add('hidden');
+                } else {
+                    fasilitasKamar.classList.add('hidden');
+                    fasilitasBersama.classList.remove('hidden');
+                }
+            }
+        </script>     
+    </body>
+    

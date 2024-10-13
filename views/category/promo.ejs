@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= head.title %></title>
+    <meta name="description" content="<%= head.desc %>">
+    <link rel="icon" href="<%= head.icon %>" type="image/x-icon">
+
+    <meta property="og:title" content="<%= head.title %>">
+    <meta property="og:description" content="<%= head.desc %>">
+    <meta property="og:image" content="<%= head.icon %>">
+    <meta property="og:type" content="website">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .promo-icon {
+        animation: bounce 2s infinite;
+      }
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-30px);
+        }
+        60% {
+          transform: translateY(-15px);
+        }
+      }
+      .discounted-price {
+        text-decoration: line-through;
+        color: red;
+      }
+      .slider-container {
+        position: relative;
+      }
+
+      .slider-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+      }
+
+      .prev-btn,
+      .next-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      .prev-btn {
+        left: 10px;
+      }
+
+      .next-btn {
+        right: 10px;
+      }
+      
+      /* Ukuran standar untuk ikon */
+      .icon-size {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* Media query untuk layar mobile */
+      @media (max-width: 768px) {
+        .icon-size {
+          width: 26px;
+          height: 26px;
+        }
+        
+        /* Kurangi padding agar sesuai dengan ukuran ikon */
+        .fixed > div {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased bg-gray-100">
+    <!-- Header -->
+    <%- include('../partials/header') %>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+      <!-- Promo Section -->
+      <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-800">Promo Kost</h2><br>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <%- include('../partials/product') %>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+  </body>
+</html>

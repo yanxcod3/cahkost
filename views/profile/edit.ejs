@@ -1,0 +1,501 @@
+<body
+    class="bg-gradient-to-r from-indigo-600 to-blue-300 min-h-screen flex items-center justify-center p-4"
+  >
+    <div
+      class="w-full max-w-4xl bg-gray-900 rounded-lg shadow-lg overflow-hidden"
+    >
+      <% if(action == 'edit') { %>
+        <div
+        class="text-center py-6 bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
+      >
+        <h1 class="text-2xl md:text-3xl font-bold">CahKost</h1>
+        <p class="mt-2">Edit Profil Anda</p>
+      </div>
+      
+      <div class="p-6 md:p-8">
+        <!-- Edit Photo Section -->
+        <div class="mb-8 flex flex-col items-center">
+          <div class="flex flex-col sm:flex-row items-center">
+            <img
+              id="profile"
+              class="w-24 h-24 rounded-full object-cover mb-4 sm:mb-0 sm:mr-0"
+              src="<%= user.user_profile %>"
+              alt="Profile Photo"
+            />
+          </div>
+          <form method="post" action="/profile" class="space-y-6" onsubmit="return validateForm()" enctype="multipart/form-data">
+          <div class="flex flex-col sm:flex-row items-center">
+            <label for="profileInput" class="custom-file-upload mb-8" style="transform: translateY(15px);">
+              Ganti Foto
+            </label>
+            <input
+              type="file"
+              name="profileInput"
+              id="profileInput"
+              accept="image/*"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300 mb-4"
+              style="transform: translateY(15px);"
+            />
+          </div>
+        </div>
+      
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Kiri -->
+            <div class="space-y-6">
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-300"
+                  >Nama Lengkap</label
+                >
+                <input
+                  id="name"
+                  name="nama"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                  value="<%= user.user_name %>"
+                  required
+                />
+              </div>
+      
+              <div>
+                <label for="gender" class="block text-sm font-medium text-gray-300"
+                  >Jenis Kelamin</label
+                >
+                <select
+                  id="gender"
+                  name="gender"
+                  required
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                >
+                  <% if (user.user_kelamin == '-') { %>
+                    <option value="-">Pilih Jenis Kelamin</option>
+                  <% } else { %>
+                    <option hidden><%= user.user_kelamin %></option>
+                  <% } %>
+                  <option>Laki-Laki</option>
+                  <option>Perempuan</option>
+                </select>
+              </div>
+            </div>
+      
+            <!-- Kolom Kanan -->
+            <div class="space-y-6">
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-300"
+                  >Nomor Telepon</label
+                >
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                  value="<%= user.user_nohp %>"
+                  required
+                />
+              </div>
+              <div>
+                <label for="faculty" class="block text-sm font-medium text-gray-300"
+                  >Fakultas</label
+                >
+                <select
+                  id="faculty"
+                  name="faculty"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                >
+                  <% if (user.user_fakultas == '-') { %>
+                    <option value="-" hidden>Pilih Fakultas</option>
+                  <% } else { %>
+                    <option hidden><%= user.user_fakultas %></option>
+                  <% } %>
+                  <option>Fakultas Matematika dan Ilmu Pengetahuan Alam</option>
+                  <option>Fakultas Teknik</option>
+                  <option>Fakultas Ekonomi dan Bisnis</option>
+                  <option>Fakultas Ilmu Sosial dan Politik</option>
+                  <option>Fakultas Hukum</option>
+                  <option>Fakultas Vokasi</option>
+                </select>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Change Password Section -->
+          <div class="space-y-6">
+            <div>
+              <input type="checkbox" name="checkbox" id="change-password-checkbox" onclick="togglePasswordFields()" />
+              <label for="change-password-checkbox" class="ml-2 text-sm font-medium text-gray-300">Ubah Password</label>
+            </div>
+            <div id="change-password-fields" class="hidden">
+              <div class="relative mt-1">
+                <label for="password" class="block text-sm font-medium text-gray-300">Masukkan Password Lama</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Enter Password"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                />
+                <button
+                  type="button"
+                  id="toggle-password1"
+                  class="absolute inset-y-0 right-0 top-6 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  onclick="togglePasswordVisibility1()"
+                >
+                  <svg
+                    id="eye-icon-open1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3C6.48 3 2 9 2 12s4.48 9 10 9 10-6 10-9-4.48-9-10-9zm0 12a3 3 0 100-6 3 3 0 000 6z"
+                    />
+                  </svg>
+                  <svg
+                    id="eye-icon-closed1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="hidden h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 3l18 18M12 6c4.67 0 8 6 8 6s-3.33 6-8 6-8-6-8-6 3.33-6 8-6zm0 10a4 4 0 100-8 4 4 0 000 8z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <br>
+              <div class="relative mt-1">
+                <label for="new-password" class="block text-sm font-medium text-gray-300">Masukkan Password Baru</label>
+                <input
+                  id="new-password"
+                  name="newpassword"
+                  type="password"
+                  placeholder="Enter New Password"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                />
+                <button
+                  type="button"
+                  id="toggle-password"
+                  class="absolute inset-y-0 right-0 top-6 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  onclick="togglePasswordVisibility()"
+                >
+                  <svg
+                    id="eye-icon-open"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3C6.48 3 2 9 2 12s4.48 9 10 9 10-6 10-9-4.48-9-10-9zm0 12a3 3 0 100-6 3 3 0 000 6z"
+                    />
+                  </svg>
+                  <svg
+                    id="eye-icon-closed"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="hidden h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 3l18 18M12 6c4.67 0 8 6 8 6s-3.33 6-8 6-8-6-8-6 3.33-6 8-6zm0 10a4 4 0 100-8 4 4 0 000 8z"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <br>
+              <div class="relative mt-1">
+                <label for="confirm-password" class="block text-sm font-medium text-gray-300">Konfirmasi Password Baru</label>
+                <input
+                  id="confirm-password"
+                  name="confirmpassword"
+                  type="password"
+                  placeholder="Enter New Password"
+                  class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                />
+                <button
+                  type="button"
+                  id="toggle-passwordd"
+                  class="absolute inset-y-0 right-0 top-6 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  onclick="togglePasswordVisibilityy()"
+                >
+                  <svg
+                    id="eye-icon-openn"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3C6.48 3 2 9 2 12s4.48 9 10 9 10-6 10-9-4.48-9-10-9zm0 12a3 3 0 100-6 3 3 0 000 6z"
+                    />
+                  </svg>
+                  <svg
+                    id="eye-icon-closedd"
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="hidden h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 3l18 18M12 6c4.67 0 8 6 8 6s-3.33 6-8 6-8-6-8-6 3.33-6 8-6zm0 10a4 4 0 100-8 4 4 0 000 8z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Save Button -->
+          <div class="mt-8 text-center">
+            <button
+              id="save-btn"
+              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring -2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Simpan Profile
+            </button>
+          </div>
+        </form>
+      </div>
+      <% } else { %>
+          <div
+        class="text-center py-6 bg-gradient-to-r from-indigo-600 to-blue-500 text-white"
+      >
+        <h1 class="text-2xl md:text-3xl font-bold">CahKost</h1>
+        <p class="mt-2">Edit Profil Anda</p>
+      </div>
+
+      <div class="p-6 md:p-8">
+        <!-- Edit Photo Section -->
+        <div class="mb-8 flex flex-col items-center">
+          <div class="flex flex-col sm:flex-row items-center">
+            <img
+              class="w-24 h-24 rounded-full object-cover mb-4 sm:mb-0 sm:mr-0"
+              src="<%= user.user_profile %>"
+              alt="Profile Photo"
+            />
+          </div>
+          <div
+            class="block text-lg font-bold text-gray-300" style="transform: translateY(10px);"
+            ><%= user.user_name %></div
+        >
+        </div>
+
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Kolom Kiri -->
+              <div class="space-y-6">
+                <div>
+                  <label for="gender" class="block w-full px-3 py-2 text-sm font-medium text-gray-300">Jenis Kelamin</label>
+                  <input
+                    id="gender"
+                    name="gender"
+                    type="gender"
+                    readonly
+                    class="mt-1 block w-full px-3 py-2 bg-transparent rounded-md text-white placeholder-gray-500 focus:outline-none"
+                    value="<%= user.user_kelamin %>"
+                  />
+                </div>
+              </div>
+
+              <!-- Kolom Kanan -->
+              <div class="space-y-6">
+                <div>
+                  <label for="phone" class="block w-full px-3 py-2 text-sm font-medium text-gray-300">Nomor Telepon</label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    readonly
+                    class="mt-1 block w-full px-3 py-2 bg-transparent rounded-md text-white placeholder-gray-500 focus:outline-none"
+                    value="<%= user.user_nohp %>"
+                  />
+                </div>
+              </div>
+
+              <!-- Kolom Fakultas di Tengah -->
+              <div>
+                <div class="space-y-6 mx-auto max-w-full">
+                  <div>
+                    <label for="faculty" class="block w-full px-3 py-2 text-sm font-medium text-gray-300 text-left">Fakultas</label>
+                    <input
+                      id="faculty"
+                      name="faculty"
+                      type="faculty"
+                      readonly
+                      class="mt-1 block w-full px-3 py-2 bg-transparent rounded-md text-white placeholder-gray-500 focus:outline-none"
+                      value="<%= user.user_fakultas %>"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          
+            <!-- Save Button -->
+            <div class="mt-8 text-center">
+              <button
+                class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-indigo-600 focus:outline-none focus:ring -2 focus:ring-offset-2 focus:ring-indigo-500"
+                onclick="window.location.href='/profile/edit'"
+              >
+                Edit Profile
+              </button>
+            </div>
+          </div>          
+
+          <!-- Akses Premium -->
+          <div class="mt-8">
+            <label for="premium" class="block text-sm font-medium text-gray-300"
+              >Premium Account</label
+            >
+            <% if(user.user_premium == 'no') { %>
+              <div
+              class="flex items-center justify-center bg-gray-700 p-4 rounded-lg cursor-pointer relative mt-1"
+              id="openModal"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6 text-yellow-400"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M12 .587l3.668 7.431L24 9.587l-6 5.853L19.334 24 12 20.137 4.666 24 6 15.44 0 9.587l8.332-1.569L12 .587z"
+                  />
+                </svg>
+              </div>
+            <% } else if(user.user_premium == 'yes') { %>
+              <div
+              class="flex items-center justify-center bg-gray-700 p-4 rounded-lg cursor-pointer relative mt-1"
+              id="premium"
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 text-green-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M12 .587l3.668 7.431L24 9.587l-6 5.853L19.334 24 12 20.137 4.666 24 6 15.44 0 9.587l8.332-1.569L12 .587z"
+                />
+              </svg>
+            </div>
+            <% } else { %>
+              <div class="flex items-center justify-center bg-gray-700 p-4 rounded-lg relative mt-1">
+                <span class="text-white font-bold">Permintaan sedang diproses! tunggu 1x24 jam.</span>
+              </div>            
+            <% } %>
+          </div>
+
+          <!-- Modal -->
+          <div
+            id="modal"
+            class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center"
+          >
+            <div class="bg-white rounded-lg shadow-lg p-4 w-1/2 relative">
+              <button
+                id="close-modal"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-500 transition duration-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <h2 class="text-lg font-bold mb-4">Upload Dokumen</h2>
+              <p class="text-sm text-gray-600 mb-4">
+                Silakan upload dokumen KTP dan selfie wajah Anda untuk meningkatkan
+                keamanan akun.
+              </p>
+              <form class="space-y-4" id="upload-form" method="post" action="/submit-premium" enctype="multipart/form-data">
+                <div>
+                  <label
+                    for="ktp"
+                    class="block text-sm font-medium text-gray-700"
+                    >Upload KTP</label
+                  >
+                  <input
+                    id="ktp"
+                    name="ktp"
+                    type="file"
+                    accept="image/*"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                  />
+                  <p id="ktp-error" class="text-red-500 text-sm hidden">
+                    File KTP belum diupload.
+                  </p>
+                </div>
+                <div>
+                  <label
+                    for="selfie"
+                    class="block text-sm font-medium text-gray-700"
+                    >Upload Selfie Wajah</label
+                  >
+                  <input
+                    id="selfie"
+                    name="selfie"
+                    type="file"
+                    accept="image/*"
+                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gradient-to-r hover:from-indigo-500 hover:to-blue-500 transition duration-300"
+                  />
+                  <p id="selfie-error" class="text-red-500 text-sm hidden">
+                    File selfie wajah belum diupload.
+                  </p>
+                </div>
+                <br />
+                <button
+                  id="upload-btn"
+                  type="submit"
+                  class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-300"
+                >
+                  Upload Dokumen
+                </button>
+              </form>
+            </div>
+          </div>
+          <p class="mt-6 text-center text-sm text-gray-400">
+            Kembali ke
+            <a
+              href="/"
+              class="font-medium text-indigo-400 hover:text-indigo-300"
+              >Beranda</a
+            >
+          </p>
+        <% } %>
+  </body>
+</html>

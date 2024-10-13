@@ -1,0 +1,525 @@
+<body class="font-sans antialiased bg-gray-100">
+  <% product.forEach(function(data) { %>
+    <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative">
+      <img src="/uploads/<%= data.product_owner %>/product/<%= data.product_id %>/1.jpeg" alt="Cah Kost" class="rounded-lg w-full" style="height: 440px; object-fit: cover;" />
+      <% if(data.product_promo != '0') { %>
+        <div class="absolute top-0 left-0 bg-red-500 text-white px-2 py-1 rounded-br-lg promo-icon"><strong>Promo</strong></div>
+        <% if(promo) { %>
+        <div class="absolute top-0 right-0 bg-purple-500 text-white px-2 py-1 rounded-bl-lg"><strong><%= data.product_type %></strong></div>
+        <% } %>
+        <h3 class="mt-4 text-lg font-bold text-gray-800"><%= data.product_name %></h3>
+        <p class="mt-2 text-gray-600"><span class="text-red-500 line-through"><b>Rp <%= data.product_price.toLocaleString('id-ID') %></span></b> Rp <%= data.product_promo.toLocaleString('id-ID') %> / bulan</p>
+      <% } else { %>
+        <h3 class="mt-4 text-lg font-bold text-gray-800"><%= data.product_name %></h3>
+        <p class="mt-2 text-gray-600">Rp <%= data.product_price.toLocaleString('id-ID') %> / bulan</p>
+      <% } %>
+      <p class="mt-2 text-sm text-gray-600"><%= data.product_deskripsi %></p>
+      <a
+        href="#"
+        class="mt-4 inline-block bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-yellow-600"
+        data-productid="<%= data.product_id %>"
+        data-owner="<%= data.product_owner %>"
+        data-name="<%= data.product_name %>"
+        data-address="<%= data.product_address %>"
+        id="price"
+        data-price="<%= data.product_price %>"
+        data-promo="<%= data.product_promo %>"
+        data-fasilitasK="<%= data.product_fasilitasK %>"
+        data-fasilitasB="<%= data.product_fasilitasB %>"
+        data-gambar="<%= data.product_gambar %>"
+        onclick="openModal(this)"
+        >Sewa</a>
+    </div>
+  <% }); %>
+  
+  <!-- Main Modal -->
+  <div id="main-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+      <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeModal()">✖</button>
+      <h3 class="text-xl font-bold text-gray-800" id="kost-name"></h3>
+      <p class="text-gray-600" id="kost-address"></p>
+
+      <!-- Image Slider -->
+      <div class="mt-4 slider-container">
+        <img id="slider-image" alt="Kost Image" class="slider-image" />
+        <button class="prev-btn" id="prev-btn">&#10094;</button>
+        <button class="next-btn" id="next-btn">&#10095;</button>
+      </div>
+
+      <button class="mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg transition duration-300 mr-2 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-500 focus:outline-none" onclick="openFacilitiesModal()">Fasilitas</button>
+      <button 
+        class="mt-4 bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-gradient-to-r hover:from-green-500 hover:to-green-700 focus:outline-none"
+        data-name="<%= user.user_name %>" 
+        data-gender="<%= user.user_kelamin %>" 
+        data-nohp="<%= user.user_nohp %>"
+        data-fakultas="<%= user.user_fakultas %>" 
+        onclick="checkUserProfile(this)">
+        Mulai Sewa</button>
+    </div>
+  </div>
+  <div
+    id="facilities-modal"
+    class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden flex items-center justify-center z-50"
+  >
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+      <button
+        class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        onclick="closeFacilitiesModal()"
+      >
+        ✖
+      </button>
+
+      <h3 class="text-xl font-bold text-gray-800">Fasilitas Kamar</h3>
+      <div id="fasilitasK-container" class="grid grid-cols-2 gap-4 mt-4"></div>
+      <h3 class="text-xl font-bold text-gray-800 mt-4">Fasilitas Bersama</h3>
+      <div id="fasilitasB-container" class="grid grid-cols-2 gap-4 mt-4"></div>
+      </div>
+    </div>
+  </div>
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeBookingModal()">
+            ✖
+        </button>
+
+        <h3 class="text-xl font-bold text-gray-800">Form Sewa</h3>
+        <form id="booking-form" method="post" action="/payment" class="mt-4 space-y-4" enctype="multipart/form-data">
+            <div><input type="hidden" name="namekost" id="product-name"></div>
+            <div><input type="hidden" name="price" id="product-price"></div>
+            <div><input type="hidden" name="orderid" id="order-id"></div>
+            <div>
+                <label class="block text-gray-600">Nama Lengkap</label>
+                <input id="nama" name="nama" type="text" class="w-full px-4 py-2 border rounded-lg" value="<%= user.user_name %>" />
+                <span id="error-nama" class="text-red-500 text-sm hidden">Nama lengkap belum diisi.</span>
+                <p id="message-nama" class="text-green-500 text-sm">Input nama lengkap sesuai data KTP.</p>
+            </div>
+            <div>
+                <label class="block text-gray-600">Nomor Telepon</label>
+                <input id="telepon" name="telepon" type="text" class="w-full px-4 py-2 border rounded-lg" value="<%= user.user_nohp %>" readonly />
+                <span id="error-telepon" class="text-red-500 text-sm hidden">Nomor telepon belum diisi.</span>
+            </div>
+            <div>
+                <label class="block text-gray-600">Durasi Sewa / Bulan</label>
+                <input id="sewa" name="amount" type="number" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan durasi sewa" oninput="updatePrice(); updateEndDate();" max="12" />
+                <span id="error-sewa" class="text-red-500 text-sm hidden">Durasi sewa belum diisi.</span>
+            </div>
+            <div class="flex justify-between space-x-4">
+                <div class="w-1/2">
+                    <label class="block text-gray-600">Tanggal Mulai</label>
+                    <input id="tanggalmulai" name="tanggalmulai" type="date" class="w-full px-4 py-2 border rounded-lg" oninput="updateEndDate()" />
+                    <span id="error-tanggal" class="text-red-500 text-sm hidden">Tanggal mulai belum diisi.</span>
+                </div>
+                <div class="w-1/2">
+                    <label class="block text-gray-600">Tanggal Selesai</label>
+                    <input id="tanggalselesai" name="tanggalselesai" type="date" class="w-full px-4 py-2 border rounded-lg" readonly/>
+                </div>
+            </div>
+            <div>
+                <label class="block text-gray-600">Foto KTP</label>
+                <input id="ktp" name="ktpInput" type="file" class="w-full px-4 py-2 border rounded-lg" accept="image/*" />
+                <span id="error-ktp" class="text-red-500 text-sm hidden">Foto KTP belum diupload.</span>
+                <p id="harga" class="mt-2 text-gray-800 font-bold hidden">Total Harga: <span id="total-harga">Rp 0</span><span id="promo-harga" class="text-red-500 line-through">Rp 0</span></p>
+            </div>
+
+            <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg" onclick="setOrderID(event)">
+                Lanjutkan ke Pembayaran
+            </button>
+        </form>
+    </div>
+</div>
+  
+<script>
+  const images = [];
+  let currentImageIndex = 0;
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Gambar untuk slider
+
+    function showImage() {
+      document.getElementById("slider-image").src = images[currentImageIndex];
+    }
+
+    function nextImage() {
+      currentImageIndex = (currentImageIndex + 1) % images.length;
+      showImage();
+    }
+
+    function prevImage() {
+      currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+      showImage();
+    }
+
+    // Event listener untuk tombol next dan prev
+    document.getElementById("next-btn").addEventListener("click", nextImage);
+    document.getElementById("prev-btn").addEventListener("click", prevImage);
+  });
+</script>
+  <script>
+    let name = ''
+    let address = ''
+    let price = ''
+    let promo = '0'
+
+    const fasilitasIcons = {
+      listrik: {
+          icon: 'fas fa-bolt',  // Ikon listrik (bolt)
+          name: 'Listrik'
+      },
+      kMandiDalam: {
+          icon: 'fas fa-shower',  // Ikon kamar mandi (shower)
+          name: 'K. Mandi Dalam'
+      },
+      wifi: {
+          icon: 'fas fa-wifi',  // Ikon WiFi
+          name: 'WiFi'
+      },
+      ac: {
+          icon: 'fas fa-snowflake',  // Ikon AC (salju)
+          name: 'AC'
+      },
+      kasur: {
+          icon: 'fas fa-bed',  // Ikon kasur (bed)
+          name: 'Kasur'
+      },
+      jendela: {
+          icon: 'fas fa-window-maximize',  // Ikon jendela (window)
+          name: 'Jendela'
+      },
+      tv: {
+          icon: 'fas fa-tv',  // Ikon TV
+          name: 'TV'
+      },
+      kursi: {
+          icon: 'fas fa-chair',  // Ikon kursi (chair)
+          name: 'Kursi'
+      },
+      kipasAngin: {
+          icon: 'fas fa-fan',  // Ikon kipas angin (fan)
+          name: 'Kipas Angin'
+      },
+      meja: {
+          icon: 'fas fa-pencil-alt',  // Ikon meja (pencil-alt)
+          name: 'Meja'
+      },
+      lemariBaju: {
+          icon: 'fas fa-tshirt',  // Ikon lemari baju (tshirt)
+          name: 'Lemari Baju'
+      },
+      klosetDuduk: {
+          icon: 'fas fa-toilet',  // Ikon kloset duduk (toilet)
+          name: 'Kloset Duduk'
+      },
+      penjagaKos: {
+          icon: 'fas fa-user-shield',  // Ikon penjaga (user-shield)
+          name: 'Penjaga Kos'
+      },
+      dispenser: {
+          icon: 'fas fa-tint',  // Ikon dispenser (tint)
+          name: 'Dispenser'
+      },
+      laundry: {
+          icon: 'fas fa-shopping-basket',  // Ikon laundry (basket)
+          name: 'Laundry'
+      },
+      kulkas: {
+          icon: 'fas fa-ice-cream',  // Ikon kulkas (ice-cream)
+          name: 'Kulkas'
+      },
+      dapur: {
+          icon: 'fas fa-utensils',  // Ikon dapur (utensils)
+          name: 'Dapur'
+      },
+      rKeluarga: {
+          icon: 'fas fa-couch',  // Ikon ruang keluarga (couch)
+          name: 'R. Keluarga'
+      },
+      mushola: {
+          icon: 'fas fa-mosque',  // Ikon mushola (mosque)
+          name: 'Mushola'
+      },
+      mesinCuci: {
+          icon: 'fas fa-soap',  // Ikon mesin cuci (soap)
+          name: 'Mesin Cuci'
+      }
+  };
+
+    function openModal(element) {
+      // Simpan posisi scroll saat ini
+      scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+      // Get data from the clicked button
+      name = element.getAttribute("data-name");
+      address = element.getAttribute("data-address");
+      const dataPromo = element.getAttribute("data-promo");
+      const dataPrice = element.getAttribute("data-price");
+      const dataOwner = element.getAttribute("data-owner");
+      const dataProduct = element.getAttribute("data-productid");
+      const fasilitasK = element.getAttribute("data-fasilitasK").split(',');
+      const fasilitasB = element.getAttribute("data-fasilitasB").split(',');
+      const dataGambar = element.getAttribute("data-gambar");
+
+      const container1 = document.getElementById('fasilitasK-container');
+      const container2 = document.getElementById('fasilitasB-container');
+      
+      const fasilitasKamar = fasilitasK.map(facility => {
+          return {
+              name: fasilitasIcons[facility]?.name || facility,  // Ambil nama dari fasilitasIcons atau gunakan nama default dari facility
+              icon: fasilitasIcons[facility]?.icon || '❓'       // Ambil icon dari fasilitasIcons atau gunakan icon default
+          };
+      });
+
+      const fasilitasBersama = fasilitasB.map(facility => {
+          return {
+              name: fasilitasIcons[facility]?.name || facility,  // Ambil nama dari fasilitasIcons atau gunakan nama default dari facility
+              icon: fasilitasIcons[facility]?.icon || '❓'       // Ambil icon dari fasilitasIcons atau gunakan icon default
+          };
+      });
+
+      // Determine hargaPerBulan based on promo
+      if (dataPromo != '0') {
+        price = dataPromo;
+        promo = dataPrice;
+      } else {
+        price = dataPrice;
+      }
+
+      for (i = 1; i < dataGambar; i++ ) {
+        images[i - 1] = `/uploads/${dataOwner}/product/${dataProduct}/${i}.jpeg`;
+      }
+
+      // Update modal content
+      document.getElementById("kost-name").textContent = name;
+      document.getElementById("kost-address").textContent = address;
+      document.getElementById("product-name").value = name;
+      document.getElementById("slider-image").src = `/uploads/${dataOwner}/product/${dataProduct}/1.jpeg`;
+  
+      // Clear container terlebih dahulu
+      container1.innerHTML = '';
+
+      // Loop melalui array fasilitas dan buat elemen HTML untuk setiap fasilitas
+      fasilitasKamar.forEach(fasilitas => {
+        const fasilitasDiv = document.createElement('div');
+        fasilitasDiv.classList.add('flex', 'items-center');
+        
+        fasilitasDiv.innerHTML = `
+          <i class="fa-solid ${fasilitas.icon} text-gray-600 text-xl"></i>
+          <span class="ml-2 text-gray-600">${fasilitas.name}</span>
+        `;
+        
+        // Masukkan elemen ke dalam container
+        container1.appendChild(fasilitasDiv);
+      });
+
+      container2.innerHTML = '';
+
+      // Loop melalui array fasilitas dan buat elemen HTML untuk setiap fasilitas
+      fasilitasBersama.forEach(fasilitas => {
+        const fasilitasDiv = document.createElement('div');
+        fasilitasDiv.classList.add('flex', 'items-center');
+        
+        fasilitasDiv.innerHTML = `
+          <i class="fa-solid ${fasilitas.icon} text-gray-600 text-xl"></i>
+          <span class="ml-2 text-gray-600">${fasilitas.name}</span>
+        `;
+        
+        // Masukkan elemen ke dalam container
+        container2.appendChild(fasilitasDiv);
+      });
+
+      // Set posisi fixed pada body dengan menjaga posisi scroll
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollPosition}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+
+      // Show modal
+      document.getElementById("main-modal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      // Enable body scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = 'auto';
+
+      // Kembalikan posisi scroll ke tempat sebelumnya
+      window.scrollTo(0, scrollPosition);
+
+      // Hide modal
+      document.getElementById("main-modal").classList.add("hidden");
+    }
+  </script>
+  <script>
+    function openBookingModal() {
+      document.getElementById('order-id').value = Date.now().toString().slice(-6);
+      document.getElementById("booking-modal").classList.remove("hidden");
+    }
+
+    function closeBookingModal() {
+      // Reset input values and error messages
+      document.getElementById("booking-form").reset(); // Reset form fields
+      document.getElementById("error-nama").classList.add("hidden");
+      document.getElementById("error-telepon").classList.add("hidden");
+      document.getElementById("error-sewa").classList.add("hidden");
+      document.getElementById("harga").classList.add("hidden");
+      document.getElementById("error-tanggal").classList.add("hidden");
+      document.getElementById("error-ktp").classList.add("hidden");
+      document.getElementById("booking-modal").classList.add("hidden");
+    }
+
+
+    function checkUserProfile(element) {
+      const nama = element.getAttribute("data-name");
+      const gender = element.getAttribute("data-gender");
+      const nohp = element.getAttribute("data-nohp");
+      const fakultas = element.getAttribute("data-fakultas");
+
+      if (nama == '' || gender == '-' || nohp == '62' || fakultas == '-') {
+          Swal.fire({
+            title: 'Profile Not Complete!',
+            text: 'Semua data profile harus di lengkapi.',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.href = '/profile'
+          })
+        } else {
+          openBookingModal();
+        }
+    }
+
+    function openFacilitiesModal() {
+      document.getElementById("facilities-modal").classList.remove("hidden");
+    }
+
+    function closeFacilitiesModal() {
+      document.getElementById("facilities-modal").classList.add("hidden");
+    }
+  </script>
+  <script>
+    document.getElementById('booking-form').addEventListener('submit', function(event) {
+      const isValid = validateForm(); // Call the validation function
+
+      if (!isValid) {
+        event.preventDefault(); // Prevent submission if not valid
+      }
+    });
+
+    // Validation function
+    function validateForm() {
+      let isValid = true;
+
+      // Your existing validation checks
+      const nama = document.getElementById("nama").value;
+      const telepon = document.getElementById("telepon").value;
+      const sewa = document.getElementById("sewa").value;
+      const tanggal = document.getElementById("tanggalmulai").value;
+      const ktp = document.getElementById("ktp").files.length;
+
+      // Reset error messages
+      document.getElementById("error-nama").classList.add("hidden");
+      document.getElementById("error-telepon").classList.add("hidden");
+      document.getElementById("error-sewa").classList.add("hidden");
+      document.getElementById("error-tanggal").classList.add("hidden");
+      document.getElementById("error-ktp").classList.add("hidden");
+
+      // Validate nama
+      if (!nama) {
+        document.getElementById("error-nama").classList.remove("hidden");
+        isValid = false;
+      }
+
+      // Validate telepon
+      if (!telepon) {
+        document.getElementById("error-telepon").classList.remove("hidden");
+        isValid = false;
+      }
+
+      // Validate sewa duration
+      if (!sewa) {
+        document.getElementById("error-sewa").classList.remove("hidden");
+        isValid = false;
+      }
+
+      // Validate start date
+      if (!tanggal) {
+        document.getElementById("error-tanggal").classList.remove("hidden");
+        isValid = false;
+      }
+
+      // Validate KTP upload
+      if (ktp === 0) {
+        document.getElementById("error-ktp").classList.remove("hidden");
+        isValid = false;
+      }
+
+      // Return the validation result
+      return isValid;
+    }
+    function updateEndDate() {
+        const tanggalMulai = document.getElementById('tanggalmulai').value;
+        let durasiSewa = parseInt(document.getElementById('sewa').value);
+
+        if (durasiSewa > 12) {
+        durasiSewa = 12
+        document.getElementById('sewa').value = 12; // Set value to 100 if exceeded
+    } else if (isNaN(durasiSewa) || durasiSewa < 0) {
+        document.getElementById('sewa').value = ''; // Clear the input if the value is not a valid number or negative
+    }
+
+        // Check if Tanggal Mulai is filled
+        if (tanggalMulai && !isNaN(durasiSewa)) {
+            const startDate = new Date(tanggalMulai);
+            // Add duration in months to start date
+            startDate.setMonth(startDate.getMonth() + durasiSewa);
+            
+            // Set the end date input field
+            const endDate = startDate.toISOString().split('T')[0]; // Format the date as 'YYYY-MM-DD'
+            document.getElementById('tanggalselesai').value = endDate;
+        } else {
+            document.getElementById('tanggalselesai').value = ''; // Clear the end date if Tanggal Mulai is not set
+        }
+    }
+  </script>
+  <script>
+    function updatePrice() {
+      const sewa = document.getElementById('sewa').value;
+      const totalHargaElement = document.getElementById('total-harga');
+      const promoHarga = document.getElementById('promo-harga');
+      const hargaElement = document.getElementById('harga');
+      const tanggalMulai = document.getElementById('tanggalmulai').value;
+      const ktp = document.getElementById("ktp").files.length;
+      const messageNama = document.getElementById('message-nama');
+
+      // Check if 'sewa', 'tanggalmulai', and 'ktp' are filled
+      if (sewa && tanggalMulai && ktp > 0) {
+        const totalPromo = promo * sewa;
+        const totalHarga = price * sewa;
+        document.getElementById("product-price").value = totalHarga;
+        if (promo != '0') {
+          promoHarga.textContent = `Rp ${totalPromo.toLocaleString('id-ID')}`;
+          totalHargaElement.textContent = `Rp ${totalHarga.toLocaleString('id-ID')} `;
+          promoHarga.classList.remove('hidden'); // Show price element
+          hargaElement.classList.remove('hidden'); // Show price element
+        } else {
+          totalHargaElement.textContent = `Rp ${totalHarga.toLocaleString('id-ID')}`;
+          promoHarga.classList.add('hidden'); // Show price element
+          hargaElement.classList.remove('hidden'); // Show price element
+        }
+        messageNama.classList.add('hidden'); // Sembunyikan pesan ketika pindah fokus
+      } else {
+        hargaElement.classList.add('hidden'); // Hide price element if fields are not filled
+        messageNama.classList.remove('hidden'); // Show price element
+      }
+    }
+
+    // Add event listeners to input fields to trigger price update
+    document.getElementById('sewa').addEventListener('input', updatePrice);
+    document.getElementById('tanggalmulai').addEventListener('input', updatePrice);
+    document.getElementById('ktp').addEventListener('change', updatePrice);
+  </script>
+</body>
