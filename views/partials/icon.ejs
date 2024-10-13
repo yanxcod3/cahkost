@@ -99,7 +99,7 @@
                     <div class="w-1/2">
                         <label class="block text-gray-600">Nama Kost</label>
                         <input type="text" id="nameKost" name="nameKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan nama kost" />
-                        <span class="text-red-600 text-sm hidden" id="nameKostAlert">Nama Kost harus diisi.</span>
+                        <span class="text-red-500 text-sm hidden" id="nameKostAlert">Nama Kost harus diisi.</span>
                     </div>
                 
                     <div class="w-1/2">
@@ -110,33 +110,33 @@
                             <option value="KOST WANITA">Kost Wanita</option>
                             <option value="KOST EKSKLUSIF">Kost Eksklusif</option>
                         </select>
-                        <span class="text-red-600 text-sm hidden" id="typeKostAlert">Kelas Kost harus dipilih.</span>
+                        <span class="text-red-500 text-sm hidden" id="typeKostAlert">Kelas Kost harus dipilih.</span>
                     </div>
                 </div>
                 
                 <div>
                     <label class="block text-gray-600">Alamat Kost</label>
                     <input type="text" id="alamatKost" name="alamatKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan alamat lengkap kost" />
-                    <span class="text-red-600 text-sm hidden" id="alamatKostAlert">Alamat Kost harus diisi.</span>
+                    <span class="text-red-500 text-sm hidden" id="alamatKostAlert">Alamat Kost harus diisi.</span>
                 </div>
                 
                 <div>
                     <label class="block text-gray-600">Deskripsi Kost</label>
                     <textarea id="deskripsiKost" name="deskripsiKost" class="w-full px-4 py-2 border rounded-lg" rows="2" placeholder="Masukkan deskripsi kost dan sertakan aturan kost yang berlaku"></textarea>
-                    <span class="text-red-600 text-sm hidden" id="deskripsiKostAlert">Deskripsi Kost harus diisi.</span>
+                    <span class="text-red-500 text-sm hidden" id="deskripsiKostAlert">Deskripsi Kost harus diisi.</span>
                 </div>
                 
                 <div class="flex justify-between space-x-4">
                     <div class="w-1/2">
                         <label class="block text-gray-600">Harga Kost</label>
                         <input type="text" id="priceKost" name="priceKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan harga kost" oninput="formatCurrency(this); updatePromoPrice()" />
-                        <span class="text-red-600 text-sm hidden" id="priceKostAlert">Harga Kost harus diisi.</span>
+                        <span class="text-red-500 text-sm hidden" id="priceKostAlert">Harga Kost harus diisi.</span>
                     </div>
                 
                     <div class="w-1/2">
                         <label class="block text-gray-600">Promo (%)</label>
                         <input type="number" id="promoKost" name="promoKost" class="w-full px-4 py-2 border rounded-lg" placeholder="Masukkan promo" oninput="updatePromoPrice(); this.value = this.value.slice(0, 3)" min="5" max="100"/>
-                        <span class="text-red-600 text-sm hidden" id="promoKostAlert">Masukkan promo jika ada, jika tidak abaikan.</span>
+                        <span class="text-red-500 text-sm hidden" id="promoKostAlert">Masukkan promo jika ada, jika tidak abaikan.</span>
                     </div>
                 </div>
                 
@@ -310,8 +310,8 @@
             </label>
 
             <button id="resetButton" class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hidden" onclick="resetImages()">Reset Gambar</button>
-            <p id="uploadAlert" class="text-red-600 hidden">Anda melebihi batas jumlah maksimal gambar.</p>
-            <p id="minAlert" class="text-red-600 hidden">Unggah minimal 5 gambar untuk melanjutkan.</p>
+            <p id="uploadAlert" class="text-red-500 hidden">Anda melebihi batas jumlah maksimal gambar.</p>
+            <p id="minAlert" class="text-red-500 hidden">Unggah minimal 5 gambar untuk melanjutkan.</p>
 
             <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-lg">
                 Submit
@@ -428,9 +428,9 @@
         </script>  
         <script>
             function openModalForm() {
+                document.querySelectorAll('.text-red-500').forEach(span => span.classList.add('hidden'));
                 document.getElementById("formModal").classList.remove("hidden");
                 document.getElementById('productForm').reset();
-                document.querySelectorAll('.text-red-600').forEach(span => span.classList.add('hidden'));
             }
             function closeModalForm() {
                 document.getElementById("formModal").classList.add("hidden");
@@ -453,7 +453,7 @@
         </script>      
         <script>
             function validateForm() {
-                document.querySelectorAll('.text-red-600').forEach(alert => alert.classList.add('hidden'));
+                document.querySelectorAll('.text-red-500').forEach(alert => alert.classList.add('hidden'));
 
                 let isValid = true;
             

@@ -14,6 +14,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
 
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
@@ -123,7 +124,7 @@
       }
     </style>
   </head>
-  <body class="font-sans antialiased bg-gray-100">
+  <body class="antialiased bg-gray-100" style="font-family: 'Poppins', sans-serif;">
     <% if (alert == 'welcome') { %>
       <script>
         Swal.fire({
@@ -485,7 +486,7 @@
       <section class="mt-16">
         <h2 class="text-2xl font-bold text-gray-800"
           data-aos="fade-right"
-          data-aos-delay="1000">
+          data-aos-delay="700">
           Pencarian alamat untuk kost
           <span
             class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
@@ -496,7 +497,7 @@
         <!-- New location iframe -->
         <div class="mt-4"
           data-aos="zoom-in-up"
-          data-aos-delay="1500">
+          data-aos-delay="1200">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d34295.990949995474!2d112.70612782875789!3d-7.328062531525581!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb67f8d1bc05%3A0xd7be60ef6890936e!2sKec.%20Gayungan%2C%20Surabaya%2C%20Jawa%20Timur!5e1!3m2!1sid!2sid!4v1727022760565!5m2!1sid!2sid"
             width="100%"
@@ -512,7 +513,7 @@
       <!-- Partnership Section -->
       <section class="mt-16 text-center"
         data-aos="fade-up"
-        data-aos-delay="1700">
+        data-aos-delay="1000">
         <h2 class="text-2xl font-bold text-gray-800">
           <span
             class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 hover:from-yellow-400 hover:to-yellow-600 transition-colors duration-300"
@@ -522,7 +523,7 @@
         </h2>
         <p class="mt-4 text-gray-600"
           data-aos="fade-right"
-          data-aos-delay="1900">
+          data-aos-delay="1200">
           Terimakasih Kepada Para Partnership Telah Bekerja Sama Dengan
           CahKost!!!
         </p>
@@ -530,7 +531,7 @@
         <div class="mt-8 flex justify-center flex-wrap gap-8">
           <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
             data-aos="zoom-in-up"
-            data-aos-delay="2000">
+            data-aos-delay="1400">
             <img
               src="/assets/home/partnership/gojek.png"
               alt="Gojek"
@@ -540,7 +541,7 @@
 
           <a href="https://www.grab.com/id/" class="w-1/3 sm:w-1/4 md:w-1/6"
             data-aos="zoom-in-up"
-            data-aos-delay="2200">
+            data-aos-delay="1600">
             <img
               src="/assets/home/partnership/Grab Official.jpeg"
               alt="Grab"
@@ -550,7 +551,7 @@
 
           <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
             data-aos="zoom-in-up"
-            data-aos-delay="2300">
+            data-aos-delay="1800">
             <img
               src="/assets/home/partnership/unesa.png"
               alt="Unesa"
@@ -560,7 +561,7 @@
 
           <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
             data-aos="zoom-in-up"
-            data-aos-delay="2500">
+            data-aos-delay="2000">
             <img
               src="/assets/home/partnership/Kota Surabaya 1.png"
               alt="Surabaya"
@@ -570,7 +571,7 @@
 
           <a href="#" class="w-1/3 sm:w-1/4 md:w-1/6"
             data-aos="zoom-in-up"
-            data-aos-delay="2700">
+            data-aos-delay="2200">
             <img
               src="/assets/home/partnership/bankmandiri.png"
               alt="Bank Mandiri"
@@ -618,74 +619,6 @@
           </div>
         </div>
       </section>
-
-      <!-- FAQ Section -->
-      <% if(!session.user_id) { %>
-      <section class="mt-16">
-        <h2 class="text-2xl font-bold text-gray-800">
-          Pertanyaan yang Sering Diajukan
-        </h2>
-        <div class="mt-4" id="faq">
-          <details class="mb-4">
-            <summary class="font-bold text-gray-600">
-              Apakah harga sewa sudah termasuk biaya listrik dan air?
-            </summary>
-            <p class="mt-2 text-gray-600">
-              "Harga sewa bulanan yang kami tawarkan sudah termasuk biaya air,
-              namun biaya listrik akan dikenakan berdasarkan penggunaan
-              masing-masing kamar. Setiap kamar dilengkapi dengan meteran
-              listrik sendiri sehingga Anda dapat memantau penggunaan secara
-              mandiri."
-            </p>
-          </details>
-          <details class="mb-4">
-            <summary class="font-bold text-gray-600">
-              Apa saja fasilitas yang tersedia di kost ini?
-            </summary>
-            <p class="mt-2 text-gray-600">
-              "Fasilitas yang kami sediakan meliputi tempat tidur, lemari
-              pakaian, meja belajar, dan AC di setiap kamar. Selain itu, kami
-              juga memiliki akses Wi-Fi, dapur bersama, ruang tamu, serta area
-              parkir yang cukup luas untuk kendaraan pribadi."
-            </p>
-          </details>
-          <details class="mb-4">
-            <summary class="font-bold text-gray-600">
-              Apakah ada jam malam atau aturan khusus untuk penghuni?
-            </summary>
-            <p class="mt-2 text-gray-600">
-              "Kami tidak memberlakukan jam malam yang ketat, namun demi
-              kenyamanan bersama, kami mengharapkan penghuni untuk menjaga
-              ketenangan setelah pukul 10 malam. Selain itu, kami juga memiliki
-              aturan dasar seperti tidak merokok di dalam ruangan dan menjaga
-              kebersihan area bersama."
-            </p>
-          </details>
-          <details class="mb-4">
-            <summary class="font-bold text-gray-600">
-              Apakah ada uang jaminan atau deposit yang perlu dibayarkan?
-            </summary>
-            <p class="mt-2 text-gray-600">
-              "Ya, kami meminta uang deposit sebesar satu bulan sewa yang akan
-              dikembalikan saat Anda pindah, asalkan tidak ada kerusakan pada
-              properti dan seluruh tagihan telah dilunasi. Uang deposit ini
-              sebagai bentuk jaminan selama masa tinggal."
-            </p>
-          </details>
-          <details class="mb-4">
-            <summary class="font-bold text-gray-600">
-              Bagaimana prosedur pembayaran sewa kost?
-            </summary>
-            <p class="mt-2 text-gray-600">
-              "Pembayaran sewa dapat dilakukan secara bulanan melalui transfer
-              bank atau pembayaran tunai. Kami juga memberikan fleksibilitas
-              untuk pembayaran di awal bulan atau di akhir bulan, sesuai dengan
-              perjanjian yang telah disepakati."
-            </p>
-          </details>
-        </div>
-      </section>
-      <% } %>
     </main>
 
     <!-- Footer -->
@@ -758,6 +691,9 @@
 
         // Memastikan orderId ada sebelum melakukan fetch
         if (orderId && code === '200' && status === 'settlement') {
+          fetch(`/sendmail/?order_id=${orderId}&status_code=${code}&transaction_status=${status}`, {
+              method: 'POST',
+          })
           openModal()
         }
 

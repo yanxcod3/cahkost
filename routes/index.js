@@ -175,6 +175,16 @@ const readFiles = (folderPath) => {
   });
 };
 
+const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: 587,
+  secure: false,
+  auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+  },
+});
+
 const head = {
   title: "CAHKOST - Platform Penyedia Kost",
   icon: "/assets/images/favicon.png",
@@ -576,16 +586,6 @@ router.post('/login/forgot-password', function(req, res, next) {
       VALUES ("${user_email}", "${token}", "${expireDate}")`;
       database.query(iQuery, [token, expireDate, user_email], (err) => {
 
-        const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-
         const mailOptions = {
             from: 'CAH KOST <admin@cahkost.my.id>',
             to: user_email,
@@ -855,5 +855,42 @@ router.post('/notification', async (req, res) => {
       res.status(500).send('Internal server error');
   }
 });
+
+router.post('/sendmail', async (req, res) => {
+  orderID = req.query.order_id
+  database.query(`SELECT * FROM db_order WHERE order_id = ?`, [orderID], async (err, data) => {
+    database.query(`SELECT * FROM db_user WHERE user_email = ?`, [data[0].product_owner], async (err, res) => {
+      const mailOptionss = {
+        from: 'CAH KOST <admin@cahkost.my.id>',
+        to: data[0].order_email,
+        subject: `Transaksi Berhasil #${orderID}`,
+        text: `
+Halo ${data[0].order_name},
+
+Terima kasih telah melakukan transaksi di CahKost. Kami senang memberi tahu bahwa transaksi Anda telah berhasil dengan detail sebagai berikut:
+
+-------------------------------------------------------
+Nomor Pesanan: #${orderID}
+Nama Kost: ${data[0].product_name}
+Alamat Kost: ${data[0].product_address}
+Kontak Kost: ${res[0].user_nohp}
+Durasi Sewa: ${data[0].order_durasi} bulan | ${data[0].order_masa}
+Total Pembayaran: Rp ${data[0].order_price.toLocaleString('id-ID')}
+Tanggal Transaksi: ${data[0].order_pembayaran}
+-------------------------------------------------------
+Hubungi kontak pemilik kost untuk menempati kost Anda.
+
+Mohon simpan email ini sebagai bukti transaksi Anda. Anda dapat mengakses detail pemesanan Anda kapan saja di akun Anda di CahKost.
+Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di unesacahkost@gmail.com.
+
+Salam hangat,
+Tim CahKost
+`,
+      };
+  
+      await transporter.sendMail(mailOptionss);
+    });
+  });
+})
 
 module.exports = router;
