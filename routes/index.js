@@ -694,21 +694,18 @@ router.get('/profile/edit', function(req, res, next) {
 });
 
 router.post('/profile/product', upload.none(), async (req, res) => {
-  const { id, action } = req.query; // Get 'id' and 'action' from query parameters
+  const { id, action } = req.query;
   database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, async (err, data) => {
     if (action === 'delete') {
       await database.query('DELETE FROM db_product WHERE product_id = ?', [id]);
       if (fs.existsSync(`public/uploads/${data[0].user_email}/product/${id}`)) {
-        // Read all files and folders inside the directory
         const files = fs.readdirSync(`public/uploads/${data[0].user_email}/product/${id}`);
         
         files.forEach((file) => {
             const currentPath = path.join(`public/uploads/${data[0].user_email}/product/${id}`, file);
             if (fs.lstatSync(currentPath).isDirectory()) {
-                // Recursively delete subdirectories
                 deleteFolderRecursive(currentPath);
             } else {
-                // Delete file
                 fs.unlinkSync(currentPath);
             }
         });
