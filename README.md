@@ -14,4 +14,4 @@
 - Monica Cinthya, M.Kom.
 - [Muhammad Farhan Nabil](https://github.com/Boasfar27) (Frontend)
 - [Moch. Akmal Humami](https://github.com/Akamalll) (Support)
-- and me
+- and me (Backend)
