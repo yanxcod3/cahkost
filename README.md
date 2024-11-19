@@ -1,8 +1,6 @@
 ## Setting
 - **.env**  
-  Setting your API for Cloud Google, Midtrans, and email account in the `.env` file.
-- **Database**  
-  Configure the MySQL database in `database.js`.
+  Setting your Database, API for Cloud Google, Midtrans, and email account in the `.env` file.
 - **Port**  
   Set the port in `app.js`.
   
