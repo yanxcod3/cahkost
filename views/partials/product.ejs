@@ -1,6 +1,17 @@
+<style>
+  #main-modal .bg-white {
+    max-height: 90vh; /* Membatasi tinggi modal hingga 90% dari tinggi viewport */
+    overflow-y: auto; /* Mengaktifkan scroll vertikal jika konten melebihi batas */
+  }
+
+  #facilities-modal .bg-white {
+    max-height: 90vh; /* Membatasi tinggi modal hingga 90% dari tinggi viewport */
+    overflow-y: auto; /* Mengaktifkan scroll vertikal jika konten melebihi batas */
+  }
+</style>
 <body class="font-sans antialiased bg-gray-100">
   <% product.forEach(function(data) { %>
-    <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg relative">
+    <div class="product-card bg-white p-4 rounded-lg shadow hover:shadow-lg relative" data-price="<%= data.product_promo ? data.product_promo : data.product_price %>">
       <img src="/uploads/<%= data.product_owner %>/product/<%= data.product_id %>/1.jpeg" alt="Cah Kost" class="rounded-lg w-full" style="height: 440px; object-fit: cover;" />
       <% if(data.product_promo != '0') { %>
         <div class="absolute top-0 left-0 bg-red-500 text-white px-2 py-1 rounded-br-lg promo-icon"><strong>Promo</strong></div>
@@ -13,7 +24,10 @@
         <h3 class="mt-4 text-lg font-bold text-gray-800"><%= data.product_name %></h3>
         <p class="mt-2 text-gray-600">Rp <%= data.product_price.toLocaleString('id-ID') %> / bulan</p>
       <% } %>
-      <p class="mt-2 text-sm text-gray-600"><%= data.product_deskripsi %></p>
+      <p class="mt-2 text-sm text-gray-600" id="product-deskripsi">
+        <%= data.product_deskripsi.length > 100 ? data.product_deskripsi.slice(0, 170) + '...' : data.product_deskripsi %>
+      </p>
+      
       <a
         href="#"
         class="mt-4 inline-block bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-yellow-600"
@@ -21,6 +35,7 @@
         data-owner="<%= data.product_owner %>"
         data-name="<%= data.product_name %>"
         data-address="<%= data.product_address %>"
+        data-deskripsi="<%= data.product_deskripsi %>"
         id="price"
         data-price="<%= data.product_price %>"
         data-promo="<%= data.product_promo %>"
@@ -29,34 +44,47 @@
         data-gambar="<%= data.product_gambar %>"
         onclick="openModal(this)"
         >Sewa</a>
-    </div>
+    </div>    
   <% }); %>
   
   <!-- Main Modal -->
   <div id="main-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+      <!-- Tombol tutup tetap di atas -->
       <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onclick="closeModal()">✖</button>
-      <h3 class="text-xl font-bold text-gray-800" id="kost-name"></h3>
-      <p class="text-gray-600" id="kost-address"></p>
-
-      <!-- Image Slider -->
-      <div class="mt-4 slider-container">
-        <img id="slider-image" alt="Kost Image" class="slider-image" />
-        <button class="prev-btn" id="prev-btn">&#10094;</button>
-        <button class="next-btn" id="next-btn">&#10095;</button>
+      
+      <!-- Judul Kost yang menyesuaikan otomatis, tidak menggunakan absolute positioning -->
+      <h3 class="text-xl font-bold text-gray-800 break-words" id="kost-name">Nama Kost</h3>
+    
+      <!-- Alamat Kost dengan margin-top untuk memberikan ruang -->
+      <p class="text-sm text-gray-600 mt-2" id="kost-address"></p>
+    
+      <!-- Konten yang dapat di-scroll -->
+      <div class="mt-4 overflow-y-auto" style="max-height: calc(100vh - 150px);">
+        <!-- Image Slider -->
+        <div class="mt-4 slider-container">
+          <img id="slider-image" alt="Kost Image" class="slider-image" />
+          <button class="prev-btn" id="prev-btn">&#10094;</button>
+          <button class="next-btn" id="next-btn">&#10095;</button>
+        </div>
+    
+        <!-- Deskripsi Kost -->
+        <p class="text-gray-600 text-sm my-4" id="kost-deskripsi"></p>
+    
+        <!-- Tombol Fasilitas dan Mulai Sewa -->
+        <button class="mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg transition duration-300 mr-2 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-500 focus:outline-none" onclick="openFacilitiesModal()">Fasilitas</button>
+        <button class="mt-4 bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-gradient-to-r hover:from-green-500 hover:to-green-700 focus:outline-none"
+          data-name="<%= user.user_name %>" 
+          data-gender="<%= user.user_kelamin %>" 
+          data-nohp="<%= user.user_nohp %>"
+          data-fakultas="<%= user.user_fakultas %>" 
+          onclick="checkUserProfile(this)">
+          Mulai Sewa
+        </button>
       </div>
-
-      <button class="mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg transition duration-300 mr-2 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-500 focus:outline-none" onclick="openFacilitiesModal()">Fasilitas</button>
-      <button 
-        class="mt-4 bg-gradient-to-r from-green-400 to-green-600 text-white py-2 px-4 rounded-lg transition duration-300 hover:bg-gradient-to-r hover:from-green-500 hover:to-green-700 focus:outline-none"
-        data-name="<%= user.user_name %>" 
-        data-gender="<%= user.user_kelamin %>" 
-        data-nohp="<%= user.user_nohp %>"
-        data-fakultas="<%= user.user_fakultas %>" 
-        onclick="checkUserProfile(this)">
-        Mulai Sewa</button>
     </div>
-  </div>
+  </div>  
+  
   <div
     id="facilities-modal"
     class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden flex items-center justify-center z-50"
@@ -130,7 +158,7 @@
 </div>
   
 <script>
-  const images = [];
+  let images = [];
   let currentImageIndex = 0;
 
   document.addEventListener("DOMContentLoaded", function() {
@@ -158,6 +186,7 @@
   <script>
     let name = ''
     let address = ''
+    let deskripsi = ''
     let price = ''
     let promo = '0'
 
@@ -251,6 +280,7 @@
       // Get data from the clicked button
       name = element.getAttribute("data-name");
       address = element.getAttribute("data-address");
+      deskripsi = element.getAttribute("data-deskripsi");
       const dataPromo = element.getAttribute("data-promo");
       const dataPrice = element.getAttribute("data-price");
       const dataOwner = element.getAttribute("data-owner");
@@ -284,13 +314,14 @@
         price = dataPrice;
       }
 
-      for (i = 1; i < dataGambar; i++ ) {
-        images[i - 1] = `/uploads/${dataOwner}/product/${dataProduct}/${i}.jpeg`;
+      for (i = 0; i < dataGambar; i++ ) {
+        images[i] = `/uploads/${dataOwner}/product/${dataProduct}/${i + 1}.jpeg`;
       }
 
       // Update modal content
       document.getElementById("kost-name").textContent = name;
       document.getElementById("kost-address").textContent = address;
+      document.getElementById("kost-deskripsi").textContent = deskripsi;
       document.getElementById("product-name").value = name;
       document.getElementById("slider-image").src = `/uploads/${dataOwner}/product/${dataProduct}/1.jpeg`;
   
@@ -340,6 +371,7 @@
 
     function closeModal() {
       // Enable body scroll
+      images = []
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.left = '';
@@ -521,5 +553,32 @@
     document.getElementById('sewa').addEventListener('input', updatePrice);
     document.getElementById('tanggalmulai').addEventListener('input', updatePrice);
     document.getElementById('ktp').addEventListener('change', updatePrice);
+  </script>
+  <script>
+    document.getElementById('priceFilter').addEventListener('change', function () {
+      const filterValue = this.value;
+  
+      // Ambil elemen produk
+      const productContainer = document.getElementById('productContainer');
+      const products = Array.from(productContainer.querySelectorAll('.product-card'));
+  
+      // Sortir berdasarkan harga
+      products.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price);
+        const priceB = parseFloat(b.dataset.price);
+  
+        if (filterValue === 'asc') {
+          return priceA - priceB;
+        } else if (filterValue === 'desc') {
+          return priceB - priceA;
+        } else {
+          return 0;
+        }
+      });
+  
+      // Update urutan produk di DOM
+      productContainer.innerHTML = '';
+      products.forEach(product => productContainer.appendChild(product));
+    });
   </script>
 </body>

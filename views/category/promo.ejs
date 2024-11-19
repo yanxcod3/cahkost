@@ -101,12 +101,21 @@
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8">
       <!-- Promo Section -->
-      <section class="mt-16">
-        <h2 class="text-2xl font-bold text-gray-800">Promo Kost</h2><br>
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <section class="mt-20">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-gray-800">Promo Kost</h2>
+          <div class="flex items-center">
+            <select id="priceFilter" class="border border-gray-300 rounded px-2 py-1 bg-transparent backdrop-blur-sm text-gray-800">
+              <option value="default" hidden>Pilih Spesifikasi</option>
+              <option value="asc">Harga Termurah</option>
+              <option value="desc">Harga Termahal</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="productContainer">
           <%- include('../partials/product') %>
         </div>
-      </section>
+      </section>      
     </main>
 
     <!-- Footer -->

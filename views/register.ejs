@@ -147,14 +147,52 @@
               class="block text-sm font-medium text-gray-300"
               >Password</label
             >
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter Password"
-              required
-              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
+            <div class="relative mt-1">
+              <input
+                id="hs-toggle-password"
+                type="password"
+                name="password"
+                class="block w-full px-3 py-2 border border-gray-500 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                placeholder="Enter Password"
+                required
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  id="eye-icon-open"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 3C6.48 3 2 9 2 12s4.48 9 10 9 10-6 10-9-4.48-9-10-9zm0 12a3 3 0 100-6 3 3 0 000 6z"
+                  />
+                </svg>
+                <svg
+                  id="eye-icon-closed"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="hidden h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 3l18 18M12 6c4.67 0 8 6 8 6s-3.33 6-8 6-8-6-8-6 3.33-6 8-6zm0 10a4 4 0 100-8 4 4 0 000 8z"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="flex items-center">
             <input
@@ -196,5 +234,28 @@
         </p>
       </div>
     </div>
+    <script>
+      document
+        .getElementById("toggle-password")
+        .addEventListener("click", function () {
+          const passwordInput = document.getElementById("hs-toggle-password");
+          const eyeIconOpen = document.getElementById("eye-icon-open");
+          const eyeIconClosed = document.getElementById("eye-icon-closed");
+
+          if (passwordInput.type === "password") {
+            // Tampilkan password
+            passwordInput.type = "text";
+            // Tampilkan ikon mata tertutup dan sembunyikan mata terbuka
+            eyeIconOpen.classList.add("hidden");
+            eyeIconClosed.classList.remove("hidden");
+          } else {
+            // Sembunyikan password
+            passwordInput.type = "password";
+            // Tampilkan ikon mata terbuka dan sembunyikan mata tertutup
+            eyeIconOpen.classList.remove("hidden");
+            eyeIconClosed.classList.add("hidden");
+          }
+        });
+    </script>
   </body>
 </html>

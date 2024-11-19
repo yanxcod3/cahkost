@@ -10,16 +10,42 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
+const Sequelize = require('sequelize');
+const MySQLStore = require('connect-session-sequelize')(session.Store);
 
 const indexRouter = require('./routes/index');
 const app = express();
 
-app.use(flash());
+const sequelize = new Sequelize(process.env.DB_DATABASE, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  dialect: 'mysql',
+  logging: false
+});
+
+const sessionStore = new MySQLStore({
+  db: sequelize,
+  expiration: 10800000,
+  checkExpirationInterval: 600000,
+  endSessionOnClose: false,
+}, sequelize);
+
 app.use(session({
-  secret: 'weblesson',
+  secret: 'c@hk05t_session',
+  store: sessionStore,
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 10800000,
+    httpOnly: true,
+    secure: false
+  }
 }));
+
+sequelize.sync().then(() => {
+  console.log('Session store berhasil disinkronisasi dengan database');
+});
+
+app.use(flash());
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
@@ -37,7 +63,7 @@ passport.deserializeUser((user, done) => {
   done(null, user);
 });
 
-// view engine setup
+app.set('trust proxy', 1);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -68,4 +94,4 @@ app.use(function(err, req, res, next) {
 
 const port = process.env.PORT || 3000;
 app.listen(port);
-console.log('Listening on localhost:'+ port);
+console.log('Listening on http://localhost:'+ port);

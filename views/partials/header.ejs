@@ -6,69 +6,7 @@
   }
 </style>
 <body class="font-sans antialiased bg-gray-100">
-  <% if (!session.user_id) { %>
-      <header
-        class="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-500 to-purple-600 shadow z-50"
-      >
-        <div
-          class="container mx-auto px-4 py-4 flex justify-between items-center"
-      >
-      <a href="/">
-        <img src="/assets/images/logo.png" width="117px" height="117px">
-      </a>
-      <div class="hidden md:flex">
-        <a
-          href="/login"
-          class="ml-4 px-4 py-2 text-white hover:text-yellow-300"
-          >Log In</a
-        >
-        <a
-          href="/register"
-          class="ml-4 px-4 py-2 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-400"
-          >Register</a
-        >
-      </div>
-      <button
-        class="md:hidden text-white hover:text-yellow-300"
-        id="menu-button"
-      >
-        <svg
-          class="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16m-7 6h7"
-          ></path>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div class="hidden md:hidden" id="mobile-menu">
-      <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
-        <div class="relative dropdown">
-          <a></a>
-          <a
-            href="/login"
-            class="block px-3 py-2 rounded-md text-base font-medium text-white-500 bg-white hover:bg-gray-200"
-            >Log In</a
-          >
-          <a
-            href="/register"
-            class="block px-3 py-2 mt-4 rounded-md text-base font-medium text-gray-800 bg-yellow-300 hover:bg-yellow-400"
-            >Register</a
-          >
-        </div>
-      </nav>
-    </div>
-  </header>
-  <% } else { %>
+  <% if (session) { %>
   <header
     class="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-500 to-purple-600 shadow z-50"
   >
@@ -105,7 +43,7 @@
             </svg>
           </a>
           <div
-            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50 right-5"
+            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-0 rounded shadow-lg z-50 right-5"
           >
             <a href="/category/kost-pria" 
               class="block px-3 py-2 hover:bg-gray-200"
@@ -153,7 +91,7 @@
             />
           </a>
           <div
-            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-2 rounded shadow-lg z-50 right-5"
+            class="absolute hidden dropdown-menu bg-white text-gray-800 mt-0 rounded shadow-lg z-50 right-5"
           >
             <a
               href="/profile"
@@ -307,7 +245,69 @@
       </nav>
     </div>
   </header>
-  <% } %>
+  <% } else { %>
+    <header
+      class="fixed top-0 left-0 w-full bg-gradient-to-r from-blue-500 to-purple-600 shadow z-50"
+    >
+      <div
+        class="container mx-auto px-4 py-4 flex justify-between items-center"
+    >
+    <a href="/">
+      <img src="/assets/images/logo.png" width="117px" height="117px">
+    </a>
+    <div class="hidden md:flex">
+      <a
+        href="/login"
+        class="ml-4 px-4 py-2 text-white hover:text-yellow-300"
+        >Log In</a
+      >
+      <a
+        href="/register"
+        class="ml-4 px-4 py-2 bg-yellow-300 text-gray-800 rounded hover:bg-yellow-400"
+        >Register</a
+      >
+    </div>
+    <button
+      class="md:hidden text-white hover:text-yellow-300"
+      id="menu-button"
+    >
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16m-7 6h7"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="hidden md:hidden" id="mobile-menu">
+    <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
+      <div class="relative dropdown">
+        <a></a>
+        <a
+          href="/login"
+          class="block px-3 py-2 rounded-md text-base font-medium text-white-500 bg-white hover:bg-gray-200"
+          >Log In</a
+        >
+        <a
+          href="/register"
+          class="block px-3 py-2 mt-4 rounded-md text-base font-medium text-gray-800 bg-yellow-300 hover:bg-yellow-400"
+          >Register</a
+        >
+      </div>
+    </nav>
+  </div>
+</header>
+<% } %>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // Get all dropdown elements

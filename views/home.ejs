@@ -143,24 +143,6 @@
             }
         });
       </script>
-    <% } else if (alert == 'welcome') { %>
-      <script>
-        Swal.fire({
-            title: 'Selamat Datang, <%= user.user_name %>!',
-            text: 'Kami senang Anda di sini!',
-            imageUrl: '<%= user.user_profile %>',
-            imageWidth: 100,
-            imageHeight: 100,
-            imageAlt: 'Gambar Profil',
-            showCloseButton: true,
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true,
-            customClass: {
-                image: 'rounded-full object-cover'
-            }
-        });
-    </script>
     <% } else if(token) { %>
     <script type="text/javascript">
         window.snap.pay('<%= token %>');
@@ -182,7 +164,7 @@
         <div
           class="absolute inset-0"
           style="
-            background-image: url('/random-image');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/random-image');
             background-size: cover;
             background-position: center;
             border-radius: 0px 0px 50px 50px;
@@ -223,7 +205,7 @@
             class="slides flex transition-transform duration-700 ease-in-out"
             id="slider"
           >
-          <% image.folder1.forEach(data => { %>
+          <% image[0].forEach(data => { %>
             <div
               class="slide flex-shrink-0 w-full md:w-1/2 lg:w-1/3 px-2 transform hover:scale-105 transition-transform duration-500 ease-in-out"
             >
@@ -238,7 +220,7 @@
         </div>
       </section>
 
-      <% if(session.user_id) { %>
+      <% if(session) { %>
         <section class="mt-16">
           <h2 class="text-2xl font-bold text-gray-800">
             Di mana Anda ingin tinggal di CahKost?
@@ -334,7 +316,7 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/promo/<%= image.folder2[0] %>"
+                src="/home/promo/<%= image[1][0] %>"
                 alt="Promo 1"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
               />
@@ -356,7 +338,7 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/promo/<%= image.folder2[1] %>"
+                src="/home/promo/<%= image[1][1] %>"
                 alt="Promo 2"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
               />
@@ -378,7 +360,7 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/promo/<%= image.folder2[2] %>"
+                src="/home/promo/<%= image[1][2] %>"
                 alt="Promo 3"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-promo"
               />
@@ -419,7 +401,7 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/solusi/<%= image.folder3[0] %>"
+                src="/home/solusi/<%= image[2][0] %>"
                 alt="Feature 1"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
               />
@@ -442,7 +424,7 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/solusi/<%= image.folder3[1] %>"
+                src="/home/solusi/<%= image[2][1] %>"
                 alt="Feature 2"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
               />
@@ -465,17 +447,17 @@
           >
             <div class="overflow-hidden">
               <img
-                src="/home/solusi/<%= image.folder3[2] %>"
+                src="/home/solusi/<%= image[2][2] %>"
                 alt="Feature 3"
                 class="rounded-lg w-full transition-transform duration-500 transform hover:scale-110 slider-solusi"
               />
             </div>
             <h3 class="mt-4 text-lg font-bold text-gray-800">
-              Kost Keluarga Nyaman
+              Kost Mahasiswa Nyaman
             </h3>
             <p class="mt-2 text-gray-600">
-              Nikmati kost yang nyaman untuk keluarga kecil dengan ruang luas
-              dan fasilitas lengkap. Lokasi aman, dekat sekolah, dan pusat
+              Nikmati kost yang nyaman untuk mahasiswa dengan ruang luas
+              dan fasilitas lengkap. Lokasi aman, dekat kampus, dan pusat
               perbelanjaan.
             </p>
           </div>
@@ -606,7 +588,7 @@
                   <img
                     src="<%= data.testimoni_profile %>"
                     alt="User 1"
-                    class="rounded-full w-16 h-16 mx-auto"
+                    class="rounded-full w-16 h-16 mx-auto object-cover"
                   />
                   <p class="mt-4 text-gray-600">
                     "<%= data.testimoni_feedback %>"

@@ -221,185 +221,207 @@ router.get('/', function(req, res, next) {
     readFiles(folderPaths.folder3)
   ])
   .then(results => {
-    const folder1 = results[0];
-    const folder2 = results[1];
-    const folder3 = results[2];
+    const [folder1, folder2, folder3] = results;
 
-    let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-    database.query(sql, [req.session.user_id], (err, data) => {
-      database.query(`SELECT * FROM db_testimoni`, (err, result) => {
-        res.render('home', { 
-          head: head, 
-          image: { folder1, folder2, folder3 }, 
-          session: req.session, 
-          user: data[0] ,
-          alert: req.flash('alert'),
-          orderID: req.flash('orderID'),
-          token: req.flash('token'),
-          testimoni: result
+    // Ambil testimoni terlebih dahulu
+    database.query(`SELECT * FROM db_testimoni`, (err, testimoni) => {
+      if (err) {
+        console.error('Error fetching testimonials:', err);
+        return res.status(500).send("Database error.");
+      }
+
+      if (req.session.login) {
+        // Ambil data user jika sesi login ada
+        const userEmail = req.session.user.email;
+        const userId = req.session.user.id;
+        database.query(`SELECT * FROM db_user WHERE user_email = ? AND user_id = ?`, [userEmail, userId], (err, userData) => {
+          if (err) {
+            console.error('Error fetching user data:', err);
+            return res.status(500).send("Database error.");
+          }
+
+          // Pastikan hanya satu data user yang diambil berdasarkan session
+          if (userData.length > 0) {
+            const user = userData[0];
+
+            // Render dengan data user
+            return res.render('home', { 
+              head, 
+              image: [ folder1, folder2, folder3 ], 
+              session: req.session.login, 
+              user, // Pastikan data user yang tepat
+              alert: req.flash('alert'),
+              token: req.flash('token'),
+              testimoni
+            });
+          } else {
+            console.error('User not found in the database.');
+            return res.status(404).send("User not found.");
+          }
         });
-      });
+      } else { 
+        // Jika tidak ada sesi login, render tanpa data user
+        return res.render('home', { 
+          head, 
+          image: [ folder1, folder2, folder3 ], 
+          session: null, 
+          user: null,
+          alert: null,
+          token: null,
+          testimoni
+        });
+      }
     });
   })
+  .catch(error => {
+    console.error('Error reading files:', error);
+    res.status(500).send("File read error.");
+  });
 });
 
-
 router.get('/category/kost-pria', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sUser = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  let sProduct = `SELECT * FROM db_product WHERE product_type = "KOST PRIA"`;
-
   Promise.all([
     new Promise((resolve, reject) => {
-      database.query(sUser, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
         if (err) reject(err);
         resolve(data[0]);
       });
     }),
     new Promise((resolve, reject) => {
-      database.query(sProduct, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_product WHERE product_type = "KOST PRIA"`, (err, data) => {
         if (err) reject(err);
         resolve(data);
       });
     })
   ]).then(([user, product]) => {
-    res.render('category/kost-pria', { head: head, session: req.session, user: user, product: product, promo: false });
+    res.render('category/kost-pria', { head: head, session: req.session.user, user: user, product: product, promo: false });
   });
 });
 
 router.get('/category/kost-wanita', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sUser = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  let sProduct = `SELECT * FROM db_product WHERE product_type = "KOST WANITA"`;
-
   Promise.all([
     new Promise((resolve, reject) => {
-      database.query(sUser, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
         if (err) reject(err);
         resolve(data[0]);
       });
     }),
     new Promise((resolve, reject) => {
-      database.query(sProduct, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_product WHERE product_type = "KOST WANITA"`, (err, data) => {
         if (err) reject(err);
         resolve(data);
       });
     })
   ]).then(([user, product]) => {
-    res.render('category/kost-wanita', { head: head, session: req.session, user: user, product: product, promo: false });
+    res.render('category/kost-wanita', { head: head, session: req.session.user, user: user, product: product, promo: false });
   });
 });
 
 router.get('/category/kost-eksklusif', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sUser = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  let sProduct = `SELECT * FROM db_product WHERE product_type = "KOST EKSKLUSIF"`;
-
   Promise.all([
     new Promise((resolve, reject) => {
-      database.query(sUser, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
         if (err) reject(err);
         resolve(data[0]);
       });
     }),
     new Promise((resolve, reject) => {
-      database.query(sProduct, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_product WHERE product_type = "KOST EKSKLUSIF"`, (err, data) => {
         if (err) reject(err);
         resolve(data);
       });
     })
   ]).then(([user, product]) => {
-    res.render('category/kost-eksklusif', { head: head, session: req.session, user: user, product: product, promo: false });
+    res.render('category/kost-eksklusif', { head: head, session: req.session.user, user: user, product: product, promo: false });
   });
 });
 
 router.get('/category/promo', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sUser = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  let sProduct = `SELECT * FROM db_product WHERE product_promo != "0"`;
-
   Promise.all([
     new Promise((resolve, reject) => {
-      database.query(sUser, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
         if (err) reject(err);
         resolve(data[0]);
       });
     }),
     new Promise((resolve, reject) => {
-      database.query(sProduct, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_product WHERE product_promo != "0"`, (err, data) => {
         if (err) reject(err);
         resolve(data);
       });
     })
   ]).then(([user, product]) => {
-    res.render('category/promo', { head: head, session: req.session, user: user, product: product, promo: true });
+    res.render('category/promo', { head: head, session: req.session.user, user: user, product: product, promo: true });
   });
 });
 
 router.get('/about', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
     if (err) throw err;
-    res.render('about', { head: head, session: req.session, user: data[0] });
+    res.render('about', { head: head, session: req.session.user, user: data[0] });
   });
 });
 
 router.get('/profile', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
     if (err) throw err;
-    res.render('profile/index', { head: head, session: req.session, user: data[0], action: '', alert: '' });
+    res.render('profile/index', { head: head, session: req.session.user, user: data[0], action: '', alert: '' });
   });
 });
 
 router.get('/profile/history', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], (err, data) => {
-    let order = `SELECT * FROM db_order WHERE order_email = "${data[0].user_email}"`;
-    database.query(order, [data[0].user_email], (err, order) => {
-      res.render('profile/history', { head: head, session: req.session, user: data[0], order: order });
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
+    database.query(`SELECT * FROM db_order WHERE order_email = "${data[0].user_email}"`, (err, order) => {
+      res.render('profile/history', { head: head, session: req.session.user, user: data[0], order: order });
     });
   });
 });
 
 router.get('/profile/product', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
     database.query(`SELECT * FROM db_product WHERE product_owner = "${data[0].user_email}"`, (err, product) => {
-      res.render('profile/product', { head: head, session: req.session, user: data[0], product: product});
+      if (data[0].user_premium != 'yes') {
+        return res.redirect('/');
+      }
+      res.render('profile/product', { head: head, session: req.session.user, user: data[0], product: product});
     })
   })
 });
 
 router.get('/search', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
@@ -415,162 +437,175 @@ router.get('/search', function(req, res, next) {
     page = 'category/kost-eksklusif'
   }
 
-  let sUser = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  let sProduct = `SELECT * FROM db_product WHERE product_type = "${type}"`;
-
   Promise.all([
     new Promise((resolve, reject) => {
-      database.query(sUser, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
         if (err) reject(err);
         resolve(data[0]);
       });
     }),
     new Promise((resolve, reject) => {
-      database.query(sProduct, [req.session.user_id], (err, data) => {
+      database.query(`SELECT * FROM db_product WHERE product_type = "${type}"`, (err, data) => {
         if (err) reject(err);
         resolve(data);
       });
     })
   ]).then(([user, product]) => {
-    res.render(page, { head: head, session: req.session, user: user, product: product, promo: false });
+    res.render(page, { head: head, session: req.session.user, user: user, product: product, promo: false });
   });
 });
 
 /* LOGIN & REGISTER */
 
 router.get('/login', function(req, res, next) {
-  if (req.session.user_id) {
+  if (req.session.login) {
     return res.redirect('/');
   }
 
-  res.render('login', { head: head, session: req.session, alert: '' });
+  res.render('login', { head: head, session: req.session.user, alert: '' });
 });
 
 router.get('/register', function(req, res, next) {
-  if (req.session.user_id) {
+  if (req.session.login) {
     return res.redirect('/');
   }
 
-  res.render('register', { head: head, session: req.session, alert: '' });
+  res.render('register', { head: head, session: req.session.user, alert: '' });
 });
 
 router.get('/login/forgot-password', function(req, res, next) {
-  if (req.session.user_id) {
+  if (req.session.login) {
     return res.redirect('/');
   }
 
-  res.render('login', { head: head, session: req.session, alert: '' });
+  res.render('login', { head: head, session: req.session.user, alert: '' });
 });
 
 router.get('/auth/google', passport.authenticate('google', {
   scope: ['profile', 'email']
 }));
 
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-  const sEmail = `SELECT * FROM db_user WHERE user_email = "${req.user.emails[0].value}"`;
-  const searchID = `SELECT user_id FROM db_user WHERE user_email = "${req.user.emails[0].value}";`
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req, res) => {
+  const email = req.user.emails[0].value;
+  const name = req.user.displayName;
+  const picture = req.user._json.picture;
 
-  database.query(sEmail, [req.user.emails[0].value], (error, results) => {
-    if (results.length > 0) {
-      database.query(searchID, [req.user.emails[0].value], (error, result) => {
-        if (result.length > 0) {
-            req.session.user_id = result[0].user_id;
-            res.redirect('/');
-        } else {
-          res.render('register', { head: head, session: req.session, alert: 'Registration Failed' });
-        }
+  database.query(`SELECT * FROM db_user WHERE user_email = ?`, [email], (error, data) => {
+    if (error) {
+      console.error(error);
+      return res.redirect('/login');
+    }
+
+    if (data.length > 0) {
+      req.session.regenerate(() => {
+        req.session.login = true;
+        req.session.user = { id: data[0].user_id, email: data[0].user_email };
+        req.flash('alert', 'welcome');
+        res.redirect('/');
       });
     } else {
-      const iQuery = `    
-      INSERT INTO db_user (user_profile, user_name, user_email)
-      VALUES ("${req.user._json.picture}", "${req.user.displayName}","${req.user.emails[0].value}")
-      `;
-
-      database.query(iQuery, (error, result) => {
-        database.query(searchID, [req.user.emails[0].value], (error, result) => {
-          if (result.length > 0) {
-              req.session.user_id = result[0].user_id;
+      database.query(
+        `INSERT INTO db_user (user_profile, user_name, user_email) VALUES (?, ?, ?)`, 
+        [picture, name, email], 
+        (error, result) => {
+          if (error) {
+            console.error(error);
+            req.flash('alert', 'Registration Failed');
+            res.render('register', { head, session: req.session.user, alert: 'Registration Failed' });
+          } else {
+            req.session.regenerate(() => {
+              req.session.login = true;
+              req.session.user = { id: result.insertId, email: email };
+              req.flash('alert', 'welcome');
               res.redirect('/');
-          } else {
-            res.render('register', { head: head, session: req.session, alert: 'Registration Failed' });
+            });
           }
-        });
-      });
+        }
+      );
     }
   });
 });
 
-router.post('/login', function(req, res, next) {
-  const { email, password, remember_me } = req.body;
+router.post('/login', (req, res) => {
+const { email, password, remember_me } = req.body;
 
-  database.query(`SELECT * FROM db_user WHERE user_email = "${email}"`, function(error, data) {
-    if (data.length === 0) {
-      return res.render('login', { head, session: req.session, alert: 'Incorrect Email' });
-    }
-    if (data[0].user_password !== password) {
-      return res.render('login', { head, session: req.session, alert: 'Incorrect Password' });
-    }
-
-    req.session.user_id = data[0].user_id;
-    if (remember_me) {
-      req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
+database.query(`SELECT * FROM db_user WHERE user_email = ?`, [email], (error, data) => {
+  if (data.length > 0) {
+    if (data[0].user_password === password) {
+      req.session.regenerate(() => {
+        if (remember_me) {
+          req.session.cookie.maxAge = 3 * 24 * 60 * 60 * 1000;
+        } else {
+          req.session.cookie.expires = false;
+        }
+        req.session.login = true;
+        req.session.user = { id: data[0].user_id, email: data[0].user_email };
+        req.flash('alert', 'welcome');
+        res.redirect('/');
+      });
     } else {
-      req.session.cookie.expires = false;
+      res.render('login', { head, session: req.session.user, alert: 'Incorrect Password' });
     }
-
-    req.flash('alert', 'Welcome');
-    return res.redirect('/');
-  });
-});
-
-router.post('/register', function(req, res, next) {
-  
-  const user_email = req.body.email;
-  const user_password = req.body.password;
-  const user_fakultas = req.body.faculty;
-
-  if (user_email && user_password && user_fakultas) {
-    if (user_fakultas == 'Pilih Fakultas') {
-      return res.render('register', { head: head, session: req.session, alert: 'Not Faculty' }); 
-    }
-    if (user_password.length < 8) {
-      return res.render('register', { head: head, session: req.session, alert: 'Password Minimum' });
-    }
-
-    const sEmail = `SELECT * FROM db_user WHERE user_email = "${user_email}"`;
-    const searchID = `SELECT user_id FROM db_user WHERE user_email = "${user_email}";`
-    
-    database.query(sEmail, [user_email], (error, results) => {
-      if (results.length > 0) {
-        return res.render('register', { head: head, session: req.session, alert: 'Duplicate Account' });
-      }
-
-      const iQuery = `    
-      INSERT INTO db_user (user_profile, user_name, user_email, user_password, user_fakultas)
-      VALUES ("https://i.ibb.co.com/fndXd6y/profile-icon-png-910.png", "${user_email.split('@')[0]}","${user_email}", "${user_password}", "${user_fakultas}")
-      `;
-
-      database.query(iQuery, (error, result) => {
-        database.query(searchID, [user_email], (error, result) => {
-          if (result.length > 0) {
-              req.session.user_id = result[0].user_id;
-              req.flash('alert', 'welcome')
-              res.redirect("/")
-          } else {
-            res.render('register', { head: head, session: req.session, alert: 'Registration Failed' });
-          }
-        });
-      });
-    });
   } else {
-    res.render('register', { head: head, session: req.session, alert: 'Please fill in all fields.' });
+    res.render('login', { head, session: req.session.user, alert: 'Incorrect Email' });
   }
 });
+});
 
-router.get('/logout', function(req, res, next) {
-  req.session.destroy()
-  res.redirect("/")
-})
+router.post('/register', (req, res) => {
+const user_email = req.body.email;
+const user_password = req.body.password;
+const user_fakultas = req.body.faculty;
+
+if (user_email && user_password && user_fakultas) {
+  if (user_fakultas == 'Pilih Fakultas') {
+    return res.render('register', { head, session: req.session.user, alert: 'Not Faculty' });
+  }
+  if (user_password.length < 8) {
+    return res.render('register', { head, session: req.session.user, alert: 'Password Minimum' });
+  }
+
+  database.query(`SELECT * FROM db_user WHERE user_email = ?`, [user_email], (error, results) => {
+    if (results.length > 0) {
+      return res.render('register', { head, session: req.session.user, alert: 'Duplicate Account' });
+    }
+
+    const defaultProfile = "https://i.ibb.co.com/fndXd6y/profile-icon-png-910.png";
+    const userName = user_email.split('@')[0];
+
+    database.query(
+      `INSERT INTO db_user (user_profile, user_name, user_email, user_password, user_fakultas) VALUES (?, ?, ?, ?, ?)`, 
+      [defaultProfile, userName, user_email, user_password, user_fakultas], 
+      (error, result) => {
+        if (error) {
+          res.render('register', { head, session: req.session.user, alert: 'Registration Failed' });
+        } else {
+          req.session.regenerate(() => {
+            req.session.login = true;
+            req.session.user = { id: result.insertId, email: user_email };
+            req.flash('alert', 'welcome');
+            res.redirect('/');
+          });
+        }
+      }
+    );
+  });
+} else {
+  res.render('register', { head, session: req.session.user, alert: 'Please fill in all fields.' });
+}
+});
+
+router.get('/logout', (req, res) => {
+  req.session.login = false;
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return res.redirect('/');
+    }
+    res.clearCookie('secretname');
+    res.redirect('/');
+  });
+});
 
 router.post('/login/forgot-password', function(req, res, next) {
   
@@ -598,7 +633,7 @@ router.post('/login/forgot-password', function(req, res, next) {
         });
       });
     } else {
-      return res.render('login', { head: head, session: req.session, alert: 'Incorrect Email' });
+      return res.render('login', { head: head, session: req.session.user, alert: 'Incorrect Email' });
     }
   });
 });
@@ -656,15 +691,14 @@ router.post('/profile', upload.single('profileInput'), async (req, res) => {
   const newPassword = req.body.newpassword;
   const confirmPassword = req.body.confirmpassword;
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], async (err, data) => {
-    const sUser = `UPDATE db_user SET user_name = "${nama}", user_kelamin = "${gender}", user_nohp = "${nohp}", user_fakultas = "${fakultas}" WHERE user_id = "${req.session.user_id}"`;
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
+    const sUser = `UPDATE db_user SET user_name = "${nama}", user_kelamin = "${gender}", user_nohp = "${nohp}", user_fakultas = "${fakultas}" WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`;
     if (checkbox) {
       if (password != data[0].user_password) {
-        return res.render('profile/index', { head: head, session: req.session, user: data[0], action: 'edit', alert: 'Password Wrong' });
+        return res.render('profile/index', { head: head, session: req.session.user, user: data[0], action: 'edit', alert: 'Password Wrong' });
       } else {
         if (newPassword.length >= 8 && newPassword == confirmPassword) {
-          const sPass = `UPDATE db_user SET user_password = "${newPassword}" WHERE user_id = "${req.session.user_id}"`;
+          const sPass = `UPDATE db_user SET user_password = "${newPassword}" WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`;
           database.query(sPass)
         }
       }
@@ -672,30 +706,30 @@ router.post('/profile', upload.single('profileInput'), async (req, res) => {
     if (req.file) {
         await compressImages(req, data[0], { query: 'profile' });
         const urlImage = await uploadImage(`public/uploads/${data[0].user_email}/profile/${data[0].user_email.split('@')[0]}.jpeg`)
-        const sProfile = `UPDATE db_user SET user_profile = "${urlImage}" WHERE user_id = "${req.session.user_id}"`;
+        const sProfile = `UPDATE db_user SET user_profile = "${urlImage}" WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`;
         database.query(sProfile)
+        database.query(`UPDATE db_testimoni SET testimoni_profile = "${urlImage}" WHERE testimoni_email = "${data[0].user_email}"`)
     }
     database.query(sUser)
     database.query(`UPDATE db_testimoni SET testimoni_name = "${convertText(nama)}" WHERE testimoni_email = "${data[0].user_email}"`)
-    res.render('profile/index', { head: head, session: req.session, user: data[0], action: '', alert: 'Update Success' });
+    res.render('profile/index', { head: head, session: req.session.user, user: data[0], action: '', alert: 'Update Success' });
   });
 });
 
 router.get('/profile/edit', function(req, res, next) {
-  if (!req.session.user_id) {
+  if (!req.session.login) {
     return res.redirect('/');
   }
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, (err, data) => {
     if (err) throw err;
-    res.render('profile/index', { head: head, session: req.session, user: data[0], action: 'edit', alert: '' });
+    res.render('profile/index', { head: head, session: req.session.user, user: data[0], action: 'edit', alert: '' });
   });
 });
 
 router.post('/profile/product', upload.none(), async (req, res) => {
   const { id, action } = req.query;
-  database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, async (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
     if (action === 'delete') {
       await database.query('DELETE FROM db_product WHERE product_id = ?', [id]);
       if (fs.existsSync(`public/uploads/${data[0].user_email}/product/${id}`)) {
@@ -757,8 +791,7 @@ router.post('/payment', upload.single('ktpInput'), async (req, res) => {
     }
   };
 
-  let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-  database.query(sql, [req.session.user_id], async (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
     await compressImages(req, data[0], { query: 'payment' });
     let kost = `SELECT * FROM db_product WHERE product_name = "${nameKost}"`
     database.query(kost, [nameKost], async (err, dataKost) => {snap.createTransaction(transaction)
@@ -779,7 +812,7 @@ router.post('/payment', upload.single('ktpInput'), async (req, res) => {
 });
 
 router.post('/submit-premium', upload.fields([{ name: 'ktp' }, { name: 'selfie' }]), async (req, res) => {
-  database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, async (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
     await compressImages(req, data[0], { query: 'premium' });
     database.query(`UPDATE db_user SET user_premium = "request" WHERE user_email = "${data[0].user_email}"`)
     res.redirect('profile');
@@ -796,7 +829,7 @@ router.post('/submit-product', upload.array('imageInput'), async (req, res) => {
     promoPrice = promoPriceKost
   }
 
-  database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, async (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
     const productID = await generateID('product')
     await compressImages(req, data[0], { query: 'product', id: productID });
     database.query(`INSERT INTO db_product (product_id, product_type, product_owner, product_name, product_price, product_address, product_fasilitasK, product_fasilitasB, product_deskripsi, product_promo, product_gambar)
@@ -814,7 +847,7 @@ router.post('/submit-product', upload.array('imageInput'), async (req, res) => {
     promoPrice = promoPriceKost
   }
 
-  database.query(`SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`, async (err, data) => {
+  database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
     const productID = await generateID('product')
     await compressImages(req, data[0], { query: 'product', id: productID });
     database.query(`INSERT INTO db_product (product_id, product_type, product_owner, product_name, product_price, product_address, product_fasilitasK, product_fasilitasB, product_deskripsi, product_promo, product_gambar)
@@ -824,8 +857,7 @@ router.post('/submit-product', upload.array('imageInput'), async (req, res) => {
 
 router.post('/submit-testimoni', async (req, res) => {
   try {
-    let sql = `SELECT * FROM db_user WHERE user_id = "${req.session.user_id}"`;
-    database.query(sql, [req.session.user_id], async (err, data) => {
+    database.query(`SELECT * FROM db_user WHERE user_email = "${req.session.user.email}" AND user_id = "${req.session.user.id}"`, async (err, data) => {
       const testimoni = `INSERT INTO db_testimoni (testimoni_order, testimoni_profile, testimoni_name, testimoni_email, testimoni_feedback)
       VALUES ("${req.body.orderID}", "${data[0].user_profile}", "${convertText(req.body.nama)}", "${data[0].user_email}", "${req.body.testimoni}")`
       database.query(testimoni)
@@ -878,7 +910,7 @@ Tanggal Transaksi: ${data[0].order_pembayaran}
 Hubungi kontak pemilik kost untuk menempati kost Anda.
 
 Mohon simpan email ini sebagai bukti transaksi Anda. Anda dapat mengakses detail pemesanan Anda kapan saja di akun Anda di CahKost.
-Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di unesacahkost@gmail.com.
+Jika Anda memiliki pertanyaan lebih lanjut, jangan ragu untuk menghubungi kami di unesacahkost@gmail.com
 
 Salam hangat,
 Tim CahKost
